@@ -6,6 +6,13 @@ import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import "../src/assets/global.css"
 import VueAMap from 'vue-amap';
+import * as echarts from 'echarts';
+
+
+
+
+Vue.prototype.$echarts = echarts //挂载到Vue实例上面
+
 Vue.use(VueAMap);
 
 VueAMap.initAMapApiLoader({

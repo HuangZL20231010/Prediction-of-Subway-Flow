@@ -19,6 +19,7 @@
     "@vue/cli-plugin-babel": "~5.0.0",
     "@vue/cli-plugin-router": "~5.0.0",
     "@vue/cli-service": "~5.0.0",
+    "echarts": "^5.3.3",
     "sass-loader": "^13.0.2",
     "vue-template-compiler": "^2.6.14"
   },
