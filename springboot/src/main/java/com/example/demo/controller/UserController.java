@@ -30,7 +30,7 @@ public class UserController {
         return Result.success(page);
     }
 
-    @DeleteMapping("/test/{id}")
+    @DeleteMapping("/{id}")
     public Result<?> delete(@PathVariable Long id)
     {
         if (userService.deleteUserById(id))
@@ -39,7 +39,7 @@ public class UserController {
             return Result.error("1", "delete error");
     }
 
-    @GetMapping("/{i}")
+    @GetMapping("/test/{i}")
     @ResponseBody
     public Result<?> test(@PathVariable("i") Integer i)
     {
