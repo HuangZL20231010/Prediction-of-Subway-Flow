@@ -40,6 +40,7 @@ public class UserController {
     }
 
     @GetMapping("/{i}")
+    @ResponseBody
     public Result<?> test(@PathVariable("i") Integer i)
     {
         return Result.success();
