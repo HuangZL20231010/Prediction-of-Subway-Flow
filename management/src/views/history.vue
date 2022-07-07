@@ -4,7 +4,7 @@
 
 <script>
 export default {
-  name: "userset"
+  name: "history"
 }
 </script>
 

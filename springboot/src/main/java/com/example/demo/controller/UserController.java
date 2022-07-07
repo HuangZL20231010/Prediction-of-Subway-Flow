@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.demo.common.Result;
 import com.example.demo.pojo.User;
@@ -39,10 +40,18 @@ public class UserController {
             return Result.error("1", "delete error");
     }
 
-    @GetMapping("/test/{i}")
-    @ResponseBody
-    public Result<?> test(@PathVariable("i") Integer i)
+    @PostMapping("/test/{i}")
+    public Result<?> test(@PathVariable("i") int i)
     {
+        System.out.println(i);
+        return Result.success();
+    }
+
+    @PostMapping("/test")
+    public Result<?> login(@RequestBody int i){
+        if(i==1){
+            return Result.error("-1","收到数据！");
+        }
         return Result.success();
     }
 

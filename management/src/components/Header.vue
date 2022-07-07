@@ -11,29 +11,31 @@
       <el-col :span="12">
         <div >
         <el-menu
-          :default-active="1"
           background-color="#0d5ab1"
           class="el-menu-demo"
           mode="horizontal"
           @select="handleSelect"
           text-color="#fff"
-
+          router
+          :default-active="this.$router.path"
           style="height: 85px;font-weight: bolder;text-align: center;margin: 0;background-position: center"
           active-text-color="#ffd04b"
 
         >
 
         <el-menu-item
-            style="height: 80px;font-size: 20px;text-align: center;margin-left: 400px;background-position: center"
-            index="1"
+            style="height: 80px;font-size: 20px;text-align: center;margin-left: 200px;background-position: center"
+            index="home"
+            :rout="{path:'/home'}"
         >客流预测</el-menu-item>
           <el-menu-item
               style="height: 80px;font-size: 20px;text-align: center;"
-              index="2"
+              index="history"
+              :rout="{path:'/history'}"
           >历史数据查询</el-menu-item>
           <el-menu-item
               style="height: 80px;font-size:20px;text-align: center;"
-              index="3"
+              index="ZL"
           >出行推荐</el-menu-item>
 
 
