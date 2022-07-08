@@ -49,6 +49,7 @@ public class StationFlowServiceImpl implements StationFlowService
             inNum+=parseInt(st.getInNum(),10);
             outNum+=parseInt(st.getOutNum(),10);
         }
+
         Pair<String, String> pa=new Pair<>(String.valueOf(inNum), String.valueOf(outNum));
         return pa;
     }

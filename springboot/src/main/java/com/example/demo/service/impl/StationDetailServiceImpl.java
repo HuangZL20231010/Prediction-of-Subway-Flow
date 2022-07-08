@@ -30,6 +30,7 @@ public class StationDetailServiceImpl implements StationDetailService {
     @Override
     public List<Pair<String, String>> selectLocationList(List<StationDetail> stationDetailList) {
         List<Pair<String, String>> li=new ArrayList<>();
+
         for (StationDetail item : stationDetailList) {
             Pair<String, String> pa=new Pair<>(item.getLongitude(),item.getLatitude());
              li.add(pa);
