@@ -2,12 +2,14 @@ package com.example.demo.controller;
 
 import com.example.demo.common.Result;
 import com.example.demo.service.StationFlowService;
+import com.example.demo.util.TimeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Controller
@@ -22,8 +24,11 @@ public class StationFlowController
     @GetMapping("/StationByLine")
     public Result<?> getStationInformationByLineName(@RequestBody String lineName)
     {
+        TimeUtil timeUtil = new TimeUtil();
         Date date = new Date();
-        date.toString();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd hh:mm");
+        String time = timeUtil.toApproachTime(dateFormat.format(date)); // 当前时间转换后的结果
+
         return Result.success();
     }
 }
