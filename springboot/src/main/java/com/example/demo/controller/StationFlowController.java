@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.websocket.server.PathParam;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -22,9 +23,9 @@ public class StationFlowController
     private StationFlowService stationFlowService;
 
     // 传入线路名称，返回当前时间该线路上所有站点的经纬度和入站量，出站量等信息
-    @GetMapping("/StationByLine/{lineName}")
+    @PostMapping("/StationByLine")
     @ResponseBody
-    public Result<?> getStationInformationByLineName( @PathVariable("lineName") String lineName)
+    public Result<?> getStationInformationByLineName( @RequestBody String lineName)
     {
 //        Date date = new Date();
 //        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd hh:mm");
@@ -32,9 +33,10 @@ public class StationFlowController
 //
 //        List<StationInformation> stationInfoInLineByTime = stationFlowService.getStationInfoInLineByTime(lineName, time);
         StationInformation stationInfoInLineByTime = new StationInformation();
+
         stationInfoInLineByTime.setStationID("1");
         stationInfoInLineByTime.setTime("2022/3/3 18:00");
-        stationInfoInLineByTime.setName("信阳站");
+        stationInfoInLineByTime.setName(lineName);
         stationInfoInLineByTime.setInNum("400");
         stationInfoInLineByTime.setOutNum("300");
         stationInfoInLineByTime.setLatitude("33");

@@ -188,7 +188,7 @@ import AMapLoader from '@amap/amap-jsapi-loader';
 export default {
   data() {
     return {
-
+      sites:['同济大学','上海南站','东方明珠'],
       clicktime:0,
       nowTime:'',
       showw:true,
@@ -201,10 +201,16 @@ export default {
   mounted() {
     this.initMap();
     this.drawChart();
+
+
+
 },
   methods: {
     testclick(){
-
+      var line = '2号线';
+      request.post('/api/StationFlow/StationByLine',line).then(res =>{
+        console.log(res);
+      })
       if(this.clicktime==0){
         this.showw = !this.showw;
         this.clicktime++;
@@ -213,10 +219,9 @@ export default {
         this.drawChart();
         this.clicktime=0;
       }
-      this.toiletSelect();
-      request.post("/api/user/test",1).then(res =>{
-        console.log(res)
-      })
+      for(var i =0;i<this.sites.length;i++){
+        this.searchsite(this.sites[i]);
+      }
 
     },
     timeFormate(timeStamp) {
@@ -245,7 +250,7 @@ export default {
         key:"905b4f99bdf009b2c1607f940ec805e5", // 申请好的Web端开发者Key，首次调用 load 时必填
 
         version:"2.0",      // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
-        plugins:['AMap.LineSearch','AMap.PlaceSearch'],       // 需要使用的的插件列表，如比例尺'AMap.Scale'等
+        plugins:['AMap.LineSearch','AMap.PlaceSearch','AMap.ToolBar', 'AMap.Scale'],       // 需要使用的的插件列表，如比例尺'AMap.Scale'等
       }).then((AMap)=>{
         this.map = new AMap.Map("container",{  //设置地图容器id
           resizeEnable: true,
@@ -253,7 +258,8 @@ export default {
           mapStyle: 'amap://styles/blue',
           center: [121.45088, 31.25145]//初始化地图中心点位置
         });
-
+        this.map.addControl(new AMap.ToolBar());
+        this.map.addControl(new AMap.Scale());
         this.lineSearch();
 
       }).catch(e=>{
@@ -316,7 +322,29 @@ export default {
         strokeWeight: 3 // 线宽
       })
     },
-    toiletSelect() {
+    //打开marker消息窗体
+    openInfo(positionResult,pointData) {
+      var name=pointData.name
+      var info = [];
+      var input=6666;
+      var output=3333;
+      info.push("<div class='input-card content-window-card'>");
+      info.push("<div style=\"padding:7px 0px 0px 0px;color:red\"><h4>"+name);
+      info.push("</h4><div class='input-item'>列车信息</div></div></div>");
+      info.push("<p class='input-item'>预测入站人数</p>");
+      info.push(input)
+      info.push("<p class='input-item'>预测出站人数</p></div></div>");
+      info.push(output)
+
+      let infoWindow = new AMap.InfoWindow({
+        content: info.join(""),
+        offset: new AMap.Pixel(10, -25)
+      });
+      infoWindow.open(this.map, positionResult.lnglat);
+    },
+
+    searchsite(site) {
+      var site =site;
       var placeSearch = new AMap.PlaceSearch({ //构造地点查询类
         pageSize: 5,
         pageIndex: 1,
@@ -324,7 +352,7 @@ export default {
       });
 //关键字查询
       let _this = this;
-      placeSearch.search('上海南站', function(status, result) {
+      placeSearch.search(site, function(status, result) {
         var lat = result.poiList.pois[0].location.lat;
         var lng = result.poiList.pois[0].location.lng;
         console.log(lat,lng);
@@ -333,12 +361,41 @@ export default {
 
     },
     drawsite(lng,lat){
+      let icon = new AMap.Icon({
+        size: new AMap.Size(10, 10), // 图标尺寸
+        image:
+            "//datav.oss-cn-hangzhou.aliyuncs.com/uploads/images/32a60b3e7d599f983aa1a604fb640d7e.gif" // Icon的图像
+      });
       var marker = new window.AMap.Marker({
         position: [lng,lat],
         map:this.map,
-        icon: "https://h5.newljlx.com/static/jpjj/cesuo1.png",
-      })
-      this.map.add(marker);
+        icon: icon,
+        extData : {"name":"上海南站"}
+      });
+    //     marker.on("click", () => {
+    //   console.log(this.lnglatData[i]);
+    // });
+    // // 鼠标经过marker
+    // marker.on("mouseover", () => {
+    //   marker.setLabel({
+    //     offset: new AMap.Pixel(20, 20), //设置文本标注偏移量
+    //     content: `<div class='info'>经过了此点</div>`, //设置文本标注内容
+    //     direction: "right", //设置文本标注方位
+    //   });
+    // });
+    // // 鼠标离开marker
+    // marker.on("mouseout", () => {
+    //   marker.setLabel(null);
+    // });
+      //绑定点击事件
+      marker.on('click',positionResult => {
+        console.log(positionResult);
+        let pointData = positionResult.target.getExtData();
+        this.openInfo( positionResult ,pointData);
+      });
+
+
+    this.map.add(marker);
     },
     drawChart() {
       // 基于准备好的dom，初始化echarts实例  这个和上面的main对应
@@ -509,7 +566,7 @@ export default {
 
   #container {
   width: 100%;
-  height: 900px;
+  height: 700px;
     z-index: 0;
   margin-top: 0px;
   border: 0px;
