@@ -1,12 +1,14 @@
 package com.example.demo.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.demo.mapper.StationDetailMapper;
 import com.example.demo.pojo.table.StationDetail;
 import com.example.demo.service.StationDetailService;
-import wniemiec.util.data.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import wniemiec.util.data.Pair;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -18,11 +20,20 @@ public class StationDetailServiceImpl implements StationDetailService {
     @Override
     public List<StationDetail> selectByLineName(String lineName) {
 
-        return null;
+        QueryWrapper<StationDetail> sectionQueryWrapper = new QueryWrapper<>();
+        sectionQueryWrapper.eq("lineName", lineName);
+        List<StationDetail> StationDetails=stationDetailMapper.selectList( sectionQueryWrapper);
+
+        return StationDetails;
     }
 
     @Override
     public List<Pair<String, String>> selectLocationList(List<StationDetail> stationDetailList) {
-        return null;
+        List<Pair<String, String>> li=new ArrayList<>();
+        for (StationDetail item : stationDetailList) {
+            Pair<String, String> pa=new Pair<>(item.getLongitude(),item.getLatitude());
+             li.add(pa);
+        }
+        return li;
     }
 }
