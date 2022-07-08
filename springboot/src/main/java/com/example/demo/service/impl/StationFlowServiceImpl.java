@@ -2,9 +2,8 @@ package com.example.demo.service.impl;
 
 import com.example.demo.pojo.entity.LineInformation;
 import com.example.demo.service.StationFlowService;
-import com.sun.tools.javac.util.Pair;
 import org.springframework.stereotype.Service;
-
+import wniemiec.util.data.Pair;
 import java.util.List;
 
 @Service

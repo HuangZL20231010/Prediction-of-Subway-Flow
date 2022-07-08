@@ -1,7 +1,7 @@
 package com.example.demo.pojo.entity;
 
 import com.example.demo.pojo.table.StationDetail;
-import com.sun.tools.javac.util.Pair;
+import wniemiec.util.data.Pair;
 
 import java.util.List;
 

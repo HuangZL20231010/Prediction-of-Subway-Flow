@@ -1,7 +1,8 @@
 package com.example.demo.service;
 
 import com.example.demo.pojo.entity.LineInformation;
-import com.sun.tools.javac.util.Pair;
+import wniemiec.util.data.Pair;
+
 import java.util.List;
 
 public interface StationFlowService
