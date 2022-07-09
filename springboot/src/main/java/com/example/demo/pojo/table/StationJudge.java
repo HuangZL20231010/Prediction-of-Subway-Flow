@@ -8,10 +8,9 @@ import lombok.Data;
 @Data
 public class StationJudge
 {
-    @TableId(value = "stationID")
-    String stationID;
-    String carCapcity;
-    String morningTime;
-    String eveningTime;
-    String otherTime;
+    String stationid;
+    String carcapcity;
+    String morningtime;
+    String eveningtime;
+    String othertime;
 }

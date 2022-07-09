@@ -44,7 +44,7 @@ public class StationFlowServiceImpl implements StationFlowService
         sectionQueryWrapper2.eq("lineName", lineName);
         StationDetails=stationDetailMapper.selectList(sectionQueryWrapper2);
         for (StationDetail item : StationDetails) {
-            sectionQueryWrapper.eq("stationID", item.getStationID()).eq("time", time);
+            sectionQueryWrapper.eq("stationID", item.getStationid()).eq("time", time);
             StationFlow st= stationFlowMapper.selectOne(sectionQueryWrapper);
             inNum+=parseInt(st.getInNum(),10);
             outNum+=parseInt(st.getOutNum(),10);

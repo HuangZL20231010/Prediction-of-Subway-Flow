@@ -7,6 +7,8 @@ import java.util.List;
 
 public interface StationDetailService
 {
+    // 检索数据库中所有的线路名称
+    List<String> selectLinesName();
     // 根据线路名称检索该条线路上的所有站点
     List<StationDetail> selectByLineName(String lineName);
 

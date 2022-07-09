@@ -1,5 +1,6 @@
 package com.example.demo.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.demo.mapper.StationDetailMapper;
 import com.example.demo.pojo.table.StationDetail;
@@ -16,6 +17,21 @@ public class StationDetailServiceImpl implements StationDetailService {
 
     @Autowired
     private StationDetailMapper stationDetailMapper;
+
+    @Override
+    public List<String> selectLinesName() {
+        List<String> lineNameList = new ArrayList<>();
+        QueryWrapper<StationDetail> queryMapper = new QueryWrapper<>();
+        for (StationDetail stationDetail : stationDetailMapper.selectList(queryMapper.isNotNull("lineName")))
+        {
+            if (lineNameList.contains(stationDetail.getLinename()))
+                continue;
+            lineNameList.add(stationDetail.getLinename());
+        }
+
+        return lineNameList;
+
+    }
 
     @Override
     public List<StationDetail> selectByLineName(String lineName) {

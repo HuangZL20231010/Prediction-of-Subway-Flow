@@ -8,9 +8,8 @@ import lombok.Data;
 @Data
 public class StationFlow
 {
-    @TableId(value = "stationID")
-    String stationID;
-    String inNum;
-    String outNum;
+    String stationid;
+    String innum;
+    String outnum;
     String time;
 }

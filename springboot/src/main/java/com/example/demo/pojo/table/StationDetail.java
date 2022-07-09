@@ -9,9 +9,9 @@ import lombok.Data;
 public class StationDetail
 {
     @TableId(value = "stationID")
-    String stationID;
+    String stationid;
     String longitude;
     String latitude;
-    String stationName;
-    String lineName;
+    String stationname;
+    String linename;
 }
