@@ -7,9 +7,9 @@ import lombok.Data;
 @Data
 public class StationDetail
 {
-    String stationid;
+    int stationid;
     String longitude;
     String latitude;
     String stationname;
-    String linename;
+    int linename;
 }

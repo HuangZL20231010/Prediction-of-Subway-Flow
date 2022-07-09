@@ -9,6 +9,7 @@ import com.example.demo.pojo.entity.StationInformation;
 import com.example.demo.pojo.table.StationDetail;
 import com.example.demo.pojo.table.StationFlow;
 import com.example.demo.service.StationFlowService;
+import com.example.demo.util.TimeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import wniemiec.util.data.Pair;
@@ -67,12 +68,25 @@ public class StationFlowServiceImpl implements StationFlowService
     }
 
     @Override
-    public String getLineInnumByNameTime(String lineName, String time) {
-        return null;
+    public String getLineInnumByNameTime(String lineName, String time)
+    {
+        /* 处理时间 */
+        TimeUtil timeUtil = new TimeUtil();
+        timeUtil.setTime(time);
+        timeUtil.toApproachTime();
+        time = timeUtil.getTime();
+
+        /* 获得该线路在该时间的总入站量和出站量 */
+        Pair<String, String> lineInOutNum = getLineInOutNum(lineName, time);
+
+        /* 返回其中的客流量 */
+        return lineInOutNum.getFirst();
     }
 
     @Override
-    public List<Pair<String, String>> getLineInnumAllDay(String lineName, String time) {
+    public List<Pair<String, String>> getLineInnumAllTime(String lineName, String time)
+    {
+        QueryWrapper<StationFlow> queryWrapper = new QueryWrapper<>();
         return null;
     }
 }

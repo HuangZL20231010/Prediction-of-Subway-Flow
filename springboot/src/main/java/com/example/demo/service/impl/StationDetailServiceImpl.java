@@ -22,7 +22,7 @@ public class StationDetailServiceImpl implements StationDetailService {
     public List<String> selectLinesName() {
         List<String> lineNameList = new ArrayList<>();
         QueryWrapper<StationDetail> queryMapper = new QueryWrapper<>();
-        for (StationDetail stationDetail : stationDetailMapper.selectList(queryMapper.isNotNull("lineName")))
+        for (StationDetail stationDetail : stationDetailMapper.selectList(queryMapper.isNotNull("lineName").orderByAsc("lineName")))
         {
             if (lineNameList.contains(stationDetail.getLinename()))
                 continue;
@@ -30,7 +30,6 @@ public class StationDetailServiceImpl implements StationDetailService {
         }
 
         return lineNameList;
-
     }
 
     @Override

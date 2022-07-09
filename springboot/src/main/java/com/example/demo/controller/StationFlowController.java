@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.common.Result;
+import com.example.demo.pojo.entity.LineInformationAllTime;
 import com.example.demo.pojo.entity.StationInformation;
 import com.example.demo.service.StationDetailService;
 import com.example.demo.service.StationFlowService;
@@ -8,9 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import wniemiec.util.data.Pair;
 
 @Controller
 @RequestMapping("/StationFlow")
@@ -47,20 +48,28 @@ public class StationFlowController
         return Result.success(stationInfoInLineByTime);
     }
 
-//    @GetMapping("/AllStationsPFlowDay")
-//    @ResponseBody
-//    public Result<?> getAllStationsPFlowAllDay()
-//    {
-//        Date date = new Date();
-//        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd hh:mm");
-//        String time = dateFormat.format(date); // 当前时间
-//        List<String> linesNameList = stationDetailService.selectLinesName();    // 所有线路的名称
-//        List<Pair<String, List<String, String>>>
-//
-//        for (String lineName : linesNameList)
-//        {
-//
-//        }
-//
-//    }
+    // 接受前端请求，返回该天所有线路的所有时间点的客运量
+    @GetMapping("/AllStationsPFlowDay")
+    @ResponseBody
+    public Result<?> getAllStationsPFlowAllDay()
+    {
+        Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd hh:mm");
+        String time = dateFormat.format(date); // 当前时间
+        List<String> linesNameList = stationDetailService.selectLinesName();    // 所有线路的名称
+        List<LineInformationAllTime> lineInformationAllTimeList = new ArrayList<>();    // 最后返回的链表，存储结构体
+
+        for (String lineName : linesNameList)
+        {
+            LineInformationAllTime lineInformationAllTime = new LineInformationAllTime();
+
+            lineInformationAllTime.setLineName(lineName);   // 设置线路名
+            lineInformationAllTime.setDate(time);   // 设置时间
+            lineInformationAllTime.setInNumAllTime(stationFlowService.getLineInnumAllTime(lineName, time));  // 得到线路该天所有时间点的客运量
+
+            lineInformationAllTimeList.add(lineInformationAllTime); // 添加到链表中
+        }
+
+        return Result.success(lineInformationAllTimeList);
+    }
 }

@@ -1,28 +1,35 @@
 package com.example.demo;
 
-import com.example.demo.service.impl.StationDetailServiceImpl;
-import com.example.demo.util.TimeUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.example.demo.mapper.StationDetailMapper;
+import com.example.demo.pojo.table.StationDetail;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.ArrayList;
+import java.util.List;
+
 
 @org.springframework.boot.test.context.SpringBootTest
 public class SpringBootTest {
 
-   @Autowired
-   private StationDetailServiceImpl a;
+    @Autowired
+    private StationDetailMapper stationDetailMapper;
+
+
     @Test
     public void test()
     {
-      /*  List<StationDetail> StationDetails=a.selectByLineName("1");
-        StationDetails.forEach(item->{
-            if("1".equals(item)){
-                System.out.println(item);
-            }
-});*/
-        TimeUtil a=new TimeUtil();
-        a.setTime("2022/7/7 18:04");
-        a.toApproachTime();
-        System.out.println(a.getTime());
+        List<String> lineNameList = new ArrayList<>();
+        QueryWrapper<StationDetail> queryMapper = new QueryWrapper<>();
+        List<StationDetail> stationDetailList = stationDetailMapper.selectList(queryMapper.orderByAsc("lineName"));
+        for (StationDetail stationDetail : stationDetailList)
+        {
+            if (lineNameList.contains(stationDetail.getLinename()))
+                continue;
+            lineNameList.add(stationDetail.getLinename());
+        }
 
+        System.out.print(lineNameList);
     }
 }
