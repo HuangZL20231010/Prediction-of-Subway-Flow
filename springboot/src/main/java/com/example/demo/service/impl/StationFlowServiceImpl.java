@@ -22,15 +22,16 @@ public class StationFlowServiceImpl implements StationFlowService
 {
     @Autowired
     private StationDetailMapper stationDetailMapper;
+    @Autowired
     private StationFlowMapper  stationFlowMapper;
-    private StationJudgeMapper stationJudgeMapper;
+
     @Override
     public Pair<String, String> selectStationForNum(String stationID, String time)
     {
         QueryWrapper<StationFlow> sectionQueryWrapper = new QueryWrapper<>();
         sectionQueryWrapper.eq("stationID", stationID).eq("time",  time);
         StationFlow st=stationFlowMapper.selectOne(sectionQueryWrapper);
-        Pair<String, String>  pa=new Pair<>(st.getInNum(),st.getOutNum());
+        Pair<String, String>  pa=new Pair<>(st.getInnum(),st.getOutnum());
         return pa;
     }
 
@@ -46,8 +47,8 @@ public class StationFlowServiceImpl implements StationFlowService
         for (StationDetail item : StationDetails) {
             sectionQueryWrapper.eq("stationID", item.getStationid()).eq("time", time);
             StationFlow st= stationFlowMapper.selectOne(sectionQueryWrapper);
-            inNum+=parseInt(st.getInNum(),10);
-            outNum+=parseInt(st.getOutNum(),10);
+            inNum+=parseInt(st.getInnum(),10);
+            outNum+=parseInt(st.getOutnum(),10);
         }
 
         Pair<String, String> pa=new Pair<>(String.valueOf(inNum), String.valueOf(outNum));
@@ -62,6 +63,16 @@ public class StationFlowServiceImpl implements StationFlowService
     @Override
     public List<StationInformation> getStationInfoInLineByTime(String lineName, String time) {
 
+        return null;
+    }
+
+    @Override
+    public String getLineInnumByNameTime(String lineName, String time) {
+        return null;
+    }
+
+    @Override
+    public List<Pair<String, String>> getLineInnumAllDay(String lineName, String time) {
         return null;
     }
 }

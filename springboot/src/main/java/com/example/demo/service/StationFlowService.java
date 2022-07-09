@@ -26,4 +26,12 @@ public interface StationFlowService
     // 返回链表，元素是站点信息的实体类，注意传入的时间time需要转换
     List<StationInformation> getStationInfoInLineByTime(String lineName, String time);
 
+    // 传入特定线路的名称和时间，获取该线路在该时间点的客流量
+    // 注意处理时间
+    String getLineInnumByNameTime(String lineName, String time);
+
+    // 传入特定线路的名称和时间，获取该线路在这个时间所属的一天中，所有时间点的客流量
+    // 链表，每一个元素是一个pair，pair中的第一个为时间，第二个为该时间的客流量
+    List<Pair<String, String>> getLineInnumAllDay(String lineName, String time);
+
 }
