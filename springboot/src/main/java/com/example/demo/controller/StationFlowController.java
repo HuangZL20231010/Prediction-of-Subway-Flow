@@ -72,4 +72,16 @@ public class StationFlowController
 
         return Result.success(lineInformationAllTimeList);
     }
+
+    @GetMapping("/getStationInNumRank")
+    @ResponseBody
+    public Result<?> getStationInNumRank()
+    {
+        Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd hh:mm");
+        String time = dateFormat.format(date); // 当前时间
+
+        List<StationInformation> stationInNumRank = stationFlowService.getStationInNumRank(time, 15);
+        return Result.success(stationInNumRank);
+    }
 }

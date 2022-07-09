@@ -18,10 +18,11 @@ public class StationDetailServiceImpl implements StationDetailService {
     private StationDetailMapper stationDetailMapper;
 
     @Override
-    public List<Integer> selectLinesName() {
+    public List<Integer> selectLinesName()
+    {
         List<Integer> lineNameList = new ArrayList<>();
         QueryWrapper<StationDetail> queryMapper = new QueryWrapper<>();
-        for (StationDetail stationDetail : stationDetailMapper.selectList(queryMapper.isNotNull("lineName").orderByAsc("lineName")))
+        for (StationDetail stationDetail : stationDetailMapper.selectList(queryMapper.orderByAsc("lineName")))
         {
             if (lineNameList.contains(stationDetail.getLinename()))
                 continue;

@@ -34,4 +34,7 @@ public interface StationFlowService
     // 链表，每一个元素是一个pair，pair中的第一个为时间，第二个为该时间的客流量
     List<Pair<String, Integer>> getLineInnumAllTime(Integer lineName, String time);
 
+    // 传入时间和排行数目，获取全部地铁站的人流量排行
+    List<StationInformation> getStationInNumRank(String time, Integer number);
+
 }

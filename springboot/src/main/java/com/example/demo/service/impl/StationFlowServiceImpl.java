@@ -7,6 +7,7 @@ import com.example.demo.pojo.entity.LineInformation;
 import com.example.demo.pojo.entity.StationInformation;
 import com.example.demo.pojo.table.StationDetail;
 import com.example.demo.pojo.table.StationFlow;
+import com.example.demo.service.StationDetailService;
 import com.example.demo.service.StationFlowService;
 import com.example.demo.util.TimeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,9 @@ public class StationFlowServiceImpl implements StationFlowService
     private StationDetailMapper stationDetailMapper;
     @Autowired
     private StationFlowMapper  stationFlowMapper;
+
+    @Autowired
+    private StationDetailService stationDetailService;
 
     @Override
      public Pair<Integer, Integer> selectStationForNum(Integer stationID, String time)
@@ -126,10 +130,71 @@ public class StationFlowServiceImpl implements StationFlowService
         return lineInOutNum.getFirst();
     }
 
+    // 传入特定线路的名称和时间，获取该线路在这个时间所属的一天中，所有时间点的客流量
+    // 链表，每一个元素是一个pair，pair中的第一个为时间，第二个为该时间的客流量
     @Override
     public List<Pair<String, Integer>> getLineInnumAllTime(Integer lineName, String time)
     {
-        QueryWrapper<StationFlow> queryWrapper = new QueryWrapper<>();
-        return null;
+        /* 处理时间 */
+        TimeUtil timeUtil = new TimeUtil();
+        timeUtil.setTime(time);
+        timeUtil.toApproachTime();
+        time = timeUtil.getTime();
+
+        /* 获取所有的时间点 */
+        QueryWrapper<StationFlow> queryWrapperTime = new QueryWrapper<>();
+        queryWrapperTime.select("time").like("time", time.split(" ")).eq("stationID", 1);
+        List<Object> timeList = stationFlowMapper.selectObjs(queryWrapperTime);
+
+        /* 遍历时间点，得到该线路在所有时间点的客流量,并存到链表中 */
+        List<Pair<String, Integer>> lineInNumAllTimeList = new ArrayList<>();
+        for (Object Time : timeList)
+        {
+            Pair<String, Integer> lineInNum = new Pair<>("", 0);
+
+            lineInNum.setFirst((String) Time);  // 设置时间点
+            lineInNum.setSecond(getLineInnumByNameTime(lineName, (String) Time));   // 设置客流量
+
+            /* 加入到链表中 */
+            lineInNumAllTimeList.add(lineInNum);
+        }
+
+        return lineInNumAllTimeList;
+    }
+
+    // 传入时间和排行数目，获取全部地铁站的人流量排行
+    @Override
+    public List<StationInformation> getStationInNumRank(String time, Integer number)
+    {
+        /* 处理时间 */
+        TimeUtil timeUtil = new TimeUtil();
+        timeUtil.setTime(time);
+        timeUtil.toApproachTime();
+        time = timeUtil.getTime();
+
+        /* 查询该时间点所有站的flow信息,并按inNum【排序 */
+        QueryWrapper<StationFlow> stationFlowQueryWrapper = new QueryWrapper<>();
+        stationFlowQueryWrapper.eq("time", time).orderByDesc("inNum");
+        List<StationFlow> stationFlowList = stationFlowMapper.selectList(stationFlowQueryWrapper);
+
+        List<StationInformation> stationInformationList = new ArrayList<>();
+        for (int i = 0; i < 331 && i < number; i++)
+        {
+            StationInformation stationInformation = new StationInformation();
+            StationFlow stationFlow = stationFlowList.get(i);   // 得到排名i + 1的站点的flow表信息
+            StationDetail stationDetail = stationDetailMapper.selectOne(new QueryWrapper<StationDetail>().eq("stationID", stationFlow.getStationid())); // 得到detail表信息
+
+            stationInformation.setStationID(i + 1); // 设置站点id
+            stationInformation.setName(stationDetail.getStationname()); // 设置站点名称
+            stationInformation.setInNum(stationFlow.getInnum());    // 设置入站量
+            stationInformation.setOutNum(stationFlow.getOutnum());  // 设置出站量
+            stationInformation.setTime(time);   // 设置时间
+            stationInformation.setLatitude(stationDetail.getLatitude());    // 设置纬度
+            stationInformation.setLongitude(stationDetail.getLongitude());  // 设置经度
+
+            stationInformationList.add(stationInformation);
+        }
+
+        return stationInformationList;
     }
 }
