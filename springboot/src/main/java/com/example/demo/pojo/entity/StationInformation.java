@@ -2,27 +2,27 @@ package com.example.demo.pojo.entity;
 
 public class StationInformation
 {
-    private String stationID;   // 站点的id
+    private Integer stationID;   // 站点的id
     private String name;    // 站点的名称
     private String time;    // 时间
-    private String inNum;   // 入站量
-    private String outNum;  // 出站量
+    private Integer inNum;   // 入站量
+    private Integer outNum;  // 出站量
     private String longitude;   // 经度
     private String latitude;    // 纬度
 
-    public void setOutNum(String outNum) {
+    public void setOutNum(Integer outNum) {
         this.outNum = outNum;
     }
 
-    public void setInNum(String inNum) {
+    public void setInNum(Integer inNum) {
         this.inNum = inNum;
     }
 
-    public String getOutNum() {
+    public Integer getOutNum() {
         return outNum;
     }
 
-    public String getInNum() {
+    public Integer getInNum() {
         return inNum;
     }
 
@@ -38,11 +38,11 @@ public class StationInformation
         return name;
     }
 
-    public String getStationID() {
+    public Integer getStationID() {
         return stationID;
     }
 
-    public void setStationID(String stationID) {
+    public void setStationID(Integer stationID) {
         this.stationID = stationID;
     }
 

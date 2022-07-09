@@ -1,6 +1,5 @@
 package com.example.demo.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.demo.mapper.StationDetailMapper;
 import com.example.demo.pojo.table.StationDetail;
@@ -19,8 +18,8 @@ public class StationDetailServiceImpl implements StationDetailService {
     private StationDetailMapper stationDetailMapper;
 
     @Override
-    public List<String> selectLinesName() {
-        List<String> lineNameList = new ArrayList<>();
+    public List<Integer> selectLinesName() {
+        List<Integer> lineNameList = new ArrayList<>();
         QueryWrapper<StationDetail> queryMapper = new QueryWrapper<>();
         for (StationDetail stationDetail : stationDetailMapper.selectList(queryMapper.isNotNull("lineName").orderByAsc("lineName")))
         {
@@ -33,7 +32,7 @@ public class StationDetailServiceImpl implements StationDetailService {
     }
 
     @Override
-    public List<StationDetail> selectByLineName(String lineName) {
+    public List<StationDetail> selectByLineName(Integer lineName) {
 
         QueryWrapper<StationDetail> sectionQueryWrapper = new QueryWrapper<>();
         sectionQueryWrapper.eq("lineName", lineName);

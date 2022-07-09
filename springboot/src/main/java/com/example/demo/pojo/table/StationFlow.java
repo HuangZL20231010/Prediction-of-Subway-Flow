@@ -7,8 +7,8 @@ import lombok.Data;
 @Data
 public class StationFlow
 {
-    int stationid;
-    int innum;
-    int outnum;
+    Integer stationid;
+    Integer innum;
+    Integer outnum;
     String time;
 }

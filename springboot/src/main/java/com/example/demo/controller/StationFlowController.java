@@ -27,7 +27,7 @@ public class StationFlowController
     // 传入线路名称，返回当前时间该线路上所有站点的经纬度和入站量，出站量等信息
     @PostMapping("/StationByLine")
     @ResponseBody
-    public Result<?> getStationInformationByLineName( @RequestBody String lineName)
+    public Result<?> getStationInformationByLineName( @RequestBody Integer lineName)
     {
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd hh:mm");
@@ -41,7 +41,7 @@ public class StationFlowController
     // 传入线路名称和时间，返回该时间时间该线路上所有站点的经纬度和入站量，出站量等信息
     @PostMapping ("/StationByLineTime")
     @ResponseBody
-    public Result<?> getStationInformationInLine(@RequestBody String lineName, @RequestBody String time)
+    public Result<?> getStationInformationInLine(@RequestBody Integer lineName, @RequestBody String time)
     {
         List<StationInformation> stationInfoInLineByTime = stationFlowService.getStationInfoInLineByTime(lineName, time);
 
@@ -56,10 +56,10 @@ public class StationFlowController
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd hh:mm");
         String time = dateFormat.format(date); // 当前时间
-        List<String> linesNameList = stationDetailService.selectLinesName();    // 所有线路的名称
+        List<Integer> linesNameList = stationDetailService.selectLinesName();    // 所有线路的名称
         List<LineInformationAllTime> lineInformationAllTimeList = new ArrayList<>();    // 最后返回的链表，存储结构体
 
-        for (String lineName : linesNameList)
+        for (Integer lineName : linesNameList)
         {
             LineInformationAllTime lineInformationAllTime = new LineInformationAllTime();
 

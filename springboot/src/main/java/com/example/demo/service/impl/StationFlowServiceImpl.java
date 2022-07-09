@@ -97,7 +97,7 @@ public class StationFlowServiceImpl implements StationFlowService
     }
 
     @Override
-    public String getLineInnumByNameTime(String lineName, String time)
+    public Integer getLineInnumByNameTime(Integer lineName, String time)
     {
         /* 处理时间 */
         TimeUtil timeUtil = new TimeUtil();
@@ -106,14 +106,14 @@ public class StationFlowServiceImpl implements StationFlowService
         time = timeUtil.getTime();
 
         /* 获得该线路在该时间的总入站量和出站量 */
-        Pair<String, String> lineInOutNum = getLineInOutNum(lineName, time);
+        Pair<Integer, Integer> lineInOutNum = getLineInOutNum(lineName, time);
 
         /* 返回其中的客流量 */
         return lineInOutNum.getFirst();
     }
 
     @Override
-    public List<Pair<String, String>> getLineInnumAllTime(String lineName, String time)
+    public List<Pair<String, Integer>> getLineInnumAllTime(Integer lineName, String time)
     {
         QueryWrapper<StationFlow> queryWrapper = new QueryWrapper<>();
         return null;

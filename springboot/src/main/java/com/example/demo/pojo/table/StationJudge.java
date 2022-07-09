@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 public class StationJudge
 {
-    int stationid;
+    Integer stationid;
     String carcapcity;
     String morningtime;
     String eveningtime;
