@@ -23,10 +23,11 @@ public class StationFlowServiceImpl implements StationFlowService
     private StationDetailMapper stationDetailMapper;
     @Autowired
     private StationFlowMapper  stationFlowMapper;
-    private TimeUtil t;
+
     @Override
-    public Pair<Integer, Integer> selectStationForNum(Integer stationID, String time)
+     public Pair<Integer, Integer> selectStationForNum(Integer stationID, String time)
     {
+        TimeUtil t=new TimeUtil();
         t.setTime(time);
         t.toApproachTime();
         time=t.getTime();
@@ -37,12 +38,14 @@ public class StationFlowServiceImpl implements StationFlowService
         return pa;
     }
 
+
+
     @Override
     public Pair<Integer, Integer> getLineInOutNum(Integer lineName, String time) {
+        TimeUtil t=new TimeUtil();
         t.setTime(time);
         t.toApproachTime();
         time=t.getTime();
-        QueryWrapper<StationFlow> sectionQueryWrapper = new QueryWrapper<>();
         QueryWrapper<StationDetail> sectionQueryWrapper2 = new QueryWrapper<>();
         List<StationDetail> StationDetails;
         Integer inNum = 0;
@@ -50,10 +53,17 @@ public class StationFlowServiceImpl implements StationFlowService
         sectionQueryWrapper2.eq("lineName", lineName);
         StationDetails=stationDetailMapper.selectList(sectionQueryWrapper2);
         for (StationDetail item : StationDetails) {
-            sectionQueryWrapper.eq("stationID", item.getStationid()).eq("time", time);
-            StationFlow st= stationFlowMapper.selectOne(sectionQueryWrapper);
-            inNum+=st.getInnum();
-            outNum+=st.getOutnum();
+            QueryWrapper<StationFlow> sectionQueryWrapper = new QueryWrapper<>();
+            List<StationFlow> stationFlowList= new ArrayList<>();
+            Integer Stationid =0;
+            Stationid=item.getStationid();
+            sectionQueryWrapper.eq("time", time).eq("stationid",Stationid);
+            StationFlow stationFlow= stationFlowMapper.selectOne(sectionQueryWrapper);
+            if (stationFlow!= null) {
+                inNum += stationFlow.getInnum();
+                outNum += stationFlow.getOutnum();
+            }
+
         }
 
         Pair<Integer , Integer > pa=new Pair<>(inNum, outNum);
@@ -64,17 +74,18 @@ public class StationFlowServiceImpl implements StationFlowService
     // 该方法中，只需要设置结构中的名称，时间点，该时间点上的入站量和出站量，无需设置另外两个链表
     @Override
     public List<LineInformation> getLineInOutNumAllDay(Integer  lineName, String time) {
+        TimeUtil t=new TimeUtil();
         t.setTime(time);
         t.toApproachTime();
         time=t.getTime();
         List<LineInformation> li=new ArrayList<>();
-        QueryWrapper<StationFlow> sectionQueryWrapper = new QueryWrapper<>();
         QueryWrapper<StationDetail> sectionQueryWrapper2 = new QueryWrapper<>();
         List<StationDetail> StationDetails;
         sectionQueryWrapper2.eq("lineName", lineName);
         StationDetails=stationDetailMapper.selectList(sectionQueryWrapper2);
         for (StationDetail item : StationDetails) {
-            sectionQueryWrapper.eq("stationID", item.getStationid()).likeRight("time", time.substring(0,7));
+            QueryWrapper<StationFlow> sectionQueryWrapper = new QueryWrapper<>();
+            sectionQueryWrapper.eq("stationID", item.getStationid()).likeRight("time", time.split(" "));
             List<StationFlow > StationFlows = stationFlowMapper.selectList(sectionQueryWrapper);
             for (StationFlow item1 : StationFlows) {
                 LineInformation in=new  LineInformation() ;
@@ -91,9 +102,11 @@ public class StationFlowServiceImpl implements StationFlowService
     // 返回链表，元素是站点信息的实体类，注意传入的时间time需要转换
     @Override
     public List<StationInformation> getStationInfoInLineByTime(Integer lineName, String time) {
+        TimeUtil t=new TimeUtil();
         t.setTime(time);
         t.toApproachTime();
         time=t.getTime();
+
         return null;
     }
 
