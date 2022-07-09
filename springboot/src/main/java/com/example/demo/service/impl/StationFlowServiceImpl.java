@@ -28,6 +28,7 @@ public class StationFlowServiceImpl implements StationFlowService
     @Autowired
     private StationDetailService stationDetailService;
 
+
     @Override
      public Pair<Integer, Integer> selectStationForNum(Integer stationID, String time)
     {
@@ -77,7 +78,8 @@ public class StationFlowServiceImpl implements StationFlowService
     // 返回类型是一个结构链表，该结构定义在pojo/entity中，包含线路名称，时间点，该时间点上的入站量和出站量
     // 该方法中，只需要设置结构中的名称，时间点，该时间点上的入站量和出站量，无需设置另外两个链表
     @Override
-    public List<LineInformation> getLineInOutNumAllDay(Integer  lineName, String time) {
+    public List<LineInformation> getLineInOutNumAllDay(Integer  lineName, String time)
+    {
         TimeUtil t=new TimeUtil();
         t.setTime(time);
         t.toApproachTime();
@@ -88,19 +90,23 @@ public class StationFlowServiceImpl implements StationFlowService
         sectionQueryWrapper2.eq("lineName", lineName);
         StationDetails=stationDetailMapper.selectList(sectionQueryWrapper2);
         for (StationDetail item : StationDetails) {
-            QueryWrapper<StationFlow> sectionQueryWrapper = new QueryWrapper<>();
-            sectionQueryWrapper.eq("stationID", item.getStationid()).likeRight("time", time.split(" "));
-            List<StationFlow > StationFlows = stationFlowMapper.selectList(sectionQueryWrapper);
-            for (StationFlow item1 : StationFlows) {
-                LineInformation in=new  LineInformation() ;
-                in.setLineName(item.getLinename());
-                in.setTime(item1.getTime());
-                in.setInNum(item1.getInnum());
-                in.setOutNum(item1.getOutnum());
-                li.add(in);
+            QueryWrapper<StationFlow> queryWrapperTime = new QueryWrapper<>();
+            queryWrapperTime.select("time").like("time", time.split(" ")).eq("stationID", 1);
+            List<Object> timeList = stationFlowMapper.selectObjs(queryWrapperTime);
+            /* 遍历时间点，得到该线路在所有时间点的客流量,并存到链表中 */
+            for (Object Time : timeList)
+            {
+                LineInformation lineInformation=new  LineInformation();
+                lineInformation.setTime((String) Time);
+                Pair<Integer,Integer> pair;
+                pair=getLineInOutNum(lineName, (String) Time);
+                lineInformation.setInNum(pair.getFirst());
+                lineInformation.setOutNum(pair.getSecond());
+                li.add(lineInformation);
             }
-        }
-        return li;
+            }
+         return li;
+
     }
     // 传入特定线路的名称和时间，获取该线路在该时间点的所有站点的：id，名称，入站量，出站量，经纬度，其它变量不存
     // 返回链表，元素是站点信息的实体类，注意传入的时间time需要转换
