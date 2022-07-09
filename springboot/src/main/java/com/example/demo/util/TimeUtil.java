@@ -17,10 +17,13 @@ public class TimeUtil
     {
 
         char[] t = time.toCharArray();
-        char a=t[t.length-1];
+        char a=t[t.length-4];
         if (a >= '5') {
-            t[t.length - 2] = (char) (t[t.length - 2] + 1);
+            t[t.length - 5] = (char) (t[t.length - 5] + 1);
         }
+        t[t.length-4]='0';
+        t[t.length-3]=':';
+        t[t.length-2]='0';
         t[t.length-1]='0';
         time=new String(t);
         return true;
