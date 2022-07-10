@@ -30,8 +30,10 @@ public class StationFlowController
     public Result<?> getStationInformationByLineName( @RequestBody Integer lineName)
     {
         Date date = new Date();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd hh:mm");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
         String time = dateFormat.format(date); // 当前时间
+        String HMS = time.substring(11, 18);
+        time = "2015/04/29 " + HMS;
 
         List<StationInformation> stationInfoInLineByTime = stationFlowService.getStationInfoInLineByTime(lineName, time);
 
@@ -54,7 +56,7 @@ public class StationFlowController
     public Result<?> getAllStationsPFlowAllDay()
     {
         Date date = new Date();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd hh:mm");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
         String time = dateFormat.format(date); // 当前时间
         List<Integer> linesNameList = stationDetailService.selectLinesName();    // 所有线路的名称
         List<LineInformationAllTime> lineInformationAllTimeList = new ArrayList<>();    // 最后返回的链表，存储结构体
@@ -78,7 +80,7 @@ public class StationFlowController
     public Result<?> getStationInNumRank()
     {
         Date date = new Date();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd hh:mm");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
         String time = dateFormat.format(date); // 当前时间
 
         List<StationInformation> stationInNumRank = stationFlowService.getStationInNumRank(time, 15);
