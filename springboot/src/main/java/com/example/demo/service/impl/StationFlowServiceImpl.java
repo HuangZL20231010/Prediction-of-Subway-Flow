@@ -79,7 +79,7 @@ public class StationFlowServiceImpl implements StationFlowService
         time=t.getTime();
         List<LineFlow> li=new ArrayList<>();
         QueryWrapper<LineFlow> queryWrapperTime = new QueryWrapper<>();
-        queryWrapperTime.select("DISTINCT time").likeRight("time", time.substring(0,9));
+        queryWrapperTime.select("DISTINCT time").likeRight("time", time.substring(0,10));
         List<Object> timeList = lineFlowMapper.selectObjs(queryWrapperTime);
         /* 遍历时间点，得到该线路在所有时间点的客流量,并存到链表中 */
         for (Object Time : timeList)
@@ -98,11 +98,13 @@ public class StationFlowServiceImpl implements StationFlowService
     // 传入特定线路的名称和时间，获取该线路在该时间点的所有站点的：id，名称，入站量，出站量，经纬度，其它变量不存
     // 返回链表，元素是站点信息的实体类，注意传入的时间time需要转换
     @Override
-    public List<StationInformation> getStationInfoInLineByTime(Integer lineName, String time) {
+    public List<StationInformation> getStationInfoInLineByTime(Integer lineName, String time)
+    {
         TimeUtil timeUtil = new TimeUtil();
         timeUtil.setTime(time);
         timeUtil.toApproachTime();
         time = timeUtil.getTime();
+
         QueryWrapper<StationDetail> sectionQueryWrapper2 = new QueryWrapper<>();
         List<StationDetail> StationDetails;
         List<StationInformation>  StationInformations=new ArrayList<>();
@@ -156,7 +158,7 @@ public class StationFlowServiceImpl implements StationFlowService
 
         /* 获取所有的时间点 */
         QueryWrapper<StationFlow> queryWrapperTime = new QueryWrapper<>();
-        queryWrapperTime.select("time").like("time", time.substring(0, 10)).eq("stationID", 1);
+        queryWrapperTime.select("DISTINCT time").like("time", time.substring(0, 10)).eq("stationID", 1);
         List<Object> timeList = stationFlowMapper.selectObjs(queryWrapperTime);
 
         /* 遍历时间点，得到该线路在所有时间点的客流量,并存到链表中 */
