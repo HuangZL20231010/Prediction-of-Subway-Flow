@@ -28,7 +28,7 @@ public interface StationFlowService
 
     // 传入特定线路的名称和时间，获取该线路在该时间点的客流量
     // 注意处理时间
-    Integer getLineInnumByNameTime(Integer lineName, String time);
+    Integer getLineInnumByNameTime(Integer lineName, String time);  // 已测试
 
     // 传入特定线路的名称和时间，获取该线路在这个时间所属的一天中，所有时间点的客流量
     // 链表，每一个元素是一个pair，pair中的第一个为时间，第二个为该时间的客流量

@@ -149,7 +149,7 @@ public class StationFlowServiceImpl implements StationFlowService
 
         /* 获取所有的时间点 */
         QueryWrapper<StationFlow> queryWrapperTime = new QueryWrapper<>();
-        queryWrapperTime.select("time").like("time", time.split(" ")).eq("stationID", 1);
+        queryWrapperTime.select("time").like("time", time.substring(0, 10)).eq("stationID", 1);
         List<Object> timeList = stationFlowMapper.selectObjs(queryWrapperTime);
 
         /* 遍历时间点，得到该线路在所有时间点的客流量,并存到链表中 */
