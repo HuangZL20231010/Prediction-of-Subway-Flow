@@ -18,8 +18,19 @@ public class TimeUtil
 
         char[] t = time.toCharArray();
         char a=t[t.length-4];
-        if (a >= '5') {
+        char b=t[t.length-5];
+
+        if (a >= '5'&&b<'5') {
             t[t.length - 5] = (char) (t[t.length - 5] + 1);
+        }
+        else if (a >= '5'&&b>='5')
+        {
+            t[t.length - 7] = (char) (t[t.length - 7] + 1);
+            t[t.length - 5] ='0';
+        }
+        else
+        {
+
         }
         t[t.length-4]='0';
         t[t.length-3]=':';

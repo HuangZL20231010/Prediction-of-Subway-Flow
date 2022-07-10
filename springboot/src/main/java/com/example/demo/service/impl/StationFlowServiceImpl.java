@@ -1,10 +1,11 @@
 package com.example.demo.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.example.demo.mapper.LineFlowMapper;
 import com.example.demo.mapper.StationDetailMapper;
 import com.example.demo.mapper.StationFlowMapper;
-import com.example.demo.pojo.entity.LineInformation;
 import com.example.demo.pojo.entity.StationInformation;
+import com.example.demo.pojo.table.LineFlow;
 import com.example.demo.pojo.table.StationDetail;
 import com.example.demo.pojo.table.StationFlow;
 import com.example.demo.service.StationDetailService;
@@ -24,7 +25,8 @@ public class StationFlowServiceImpl implements StationFlowService
     private StationDetailMapper stationDetailMapper;
     @Autowired
     private StationFlowMapper  stationFlowMapper;
-
+    @Autowired
+    private LineFlowMapper lineFlowMapper;
     @Autowired
     private StationDetailService stationDetailService;
 
@@ -51,25 +53,16 @@ public class StationFlowServiceImpl implements StationFlowService
         t.setTime(time);
         t.toApproachTime();
         time=t.getTime();
-        QueryWrapper<StationDetail> sectionQueryWrapper2 = new QueryWrapper<>();
-        List<StationDetail> StationDetails;
+        QueryWrapper<LineFlow> sectionQueryWrapper2 = new QueryWrapper<>();
+        LineFlow lineFlows;
         Integer inNum = 0;
         Integer  outNum = 0;
-        sectionQueryWrapper2.eq("lineName", lineName);
-        StationDetails=stationDetailMapper.selectList(sectionQueryWrapper2);
-        for (StationDetail item : StationDetails) {
-            QueryWrapper<StationFlow> sectionQueryWrapper = new QueryWrapper<>();
-            List<StationFlow> stationFlowList= new ArrayList<>();
-            Integer Stationid =0;
-            Stationid=item.getStationid();
-            sectionQueryWrapper.eq("time", time).eq("stationid",Stationid);
-            StationFlow stationFlow= stationFlowMapper.selectOne(sectionQueryWrapper);
-            if (stationFlow!= null) {
-                inNum += stationFlow.getInnum();
-                outNum += stationFlow.getOutnum();
+        sectionQueryWrapper2.eq("lineID", lineName).eq("time",time);
+        lineFlows=lineFlowMapper.selectOne(sectionQueryWrapper2);
+            if ( lineFlows!= null) {
+                inNum =  lineFlows.getInnum();
+                outNum =  lineFlows.getOutnum();
             }
-
-        }
 
         Pair<Integer , Integer > pa=new Pair<>(inNum, outNum);
         return pa;
@@ -78,46 +71,60 @@ public class StationFlowServiceImpl implements StationFlowService
     // 返回类型是一个结构链表，该结构定义在pojo/entity中，包含线路名称，时间点，该时间点上的入站量和出站量
     // 该方法中，只需要设置结构中的名称，时间点，该时间点上的入站量和出站量，无需设置另外两个链表
     @Override
-    public List<LineInformation> getLineInOutNumAllDay(Integer  lineName, String time)
+    public List<LineFlow> getLineInOutNumAllDay(Integer  lineName, String time)
     {
         TimeUtil t=new TimeUtil();
         t.setTime(time);
         t.toApproachTime();
         time=t.getTime();
-        List<LineInformation> li=new ArrayList<>();
-        QueryWrapper<StationDetail> sectionQueryWrapper2 = new QueryWrapper<>();
-        List<StationDetail> StationDetails;
-        sectionQueryWrapper2.eq("lineName", lineName);
-        StationDetails=stationDetailMapper.selectList(sectionQueryWrapper2);
-        for (StationDetail item : StationDetails) {
-            QueryWrapper<StationFlow> queryWrapperTime = new QueryWrapper<>();
-            queryWrapperTime.select("time").like("time", time.split(" ")).eq("stationID", 1);
-            List<Object> timeList = stationFlowMapper.selectObjs(queryWrapperTime);
-            /* 遍历时间点，得到该线路在所有时间点的客流量,并存到链表中 */
-            for (Object Time : timeList)
-            {
-                LineInformation lineInformation=new  LineInformation();
-                lineInformation.setTime((String) Time);
-                Pair<Integer,Integer> pair;
-                pair=getLineInOutNum(lineName, (String) Time);
-                lineInformation.setInNum(pair.getFirst());
-                lineInformation.setOutNum(pair.getSecond());
-                li.add(lineInformation);
-            }
-            }
+        List<LineFlow> li=new ArrayList<>();
+        QueryWrapper<LineFlow> queryWrapperTime = new QueryWrapper<>();
+        queryWrapperTime.select("DISTINCT time").likeRight("time", time.substring(0,9));
+        List<Object> timeList = lineFlowMapper.selectObjs(queryWrapperTime);
+        /* 遍历时间点，得到该线路在所有时间点的客流量,并存到链表中 */
+        for (Object Time : timeList)
+        {
+          LineFlow lineFlows=new LineFlow();
+            lineFlows.setTime((String) Time);
+            Pair<Integer,Integer> pair;
+            pair=getLineInOutNum(lineName, (String) Time);
+            lineFlows.setInnum(pair.getFirst());
+            lineFlows.setOutnum(pair.getSecond());
+            lineFlows.setLineid(lineName);
+            li.add(lineFlows);
+        }
          return li;
-
     }
     // 传入特定线路的名称和时间，获取该线路在该时间点的所有站点的：id，名称，入站量，出站量，经纬度，其它变量不存
     // 返回链表，元素是站点信息的实体类，注意传入的时间time需要转换
     @Override
     public List<StationInformation> getStationInfoInLineByTime(Integer lineName, String time) {
-        TimeUtil t=new TimeUtil();
-        t.setTime(time);
-        t.toApproachTime();
-        time=t.getTime();
-
-        return null;
+        TimeUtil timeUtil = new TimeUtil();
+        timeUtil.setTime(time);
+        timeUtil.toApproachTime();
+        time = timeUtil.getTime();
+        QueryWrapper<StationDetail> sectionQueryWrapper2 = new QueryWrapper<>();
+        List<StationDetail> StationDetails;
+        List<StationInformation>  StationInformations=new ArrayList<>();
+        sectionQueryWrapper2.eq("lineName", lineName);
+        StationDetails=stationDetailMapper.selectList(sectionQueryWrapper2);
+        for (StationDetail item : StationDetails) {
+            QueryWrapper<StationFlow> sectionQueryWrapper = new QueryWrapper<>();
+            StationInformation stationInformation=new StationInformation();
+            Integer Stationid =0;
+            Stationid=item.getStationid();
+            sectionQueryWrapper.eq("time", time).eq("stationID",Stationid);
+            StationFlow stationFlow= stationFlowMapper.selectOne(sectionQueryWrapper);
+            stationInformation.setStationID(Stationid);
+            stationInformation.setName(item.getStationname());
+            stationInformation.setLongitude(item.getLongitude());
+            stationInformation.setLatitude(item.getLatitude());
+            stationInformation.setInNum(stationFlow.getInnum());
+            stationInformation.setOutNum(stationFlow.getOutnum());
+            stationInformation.setTime(time);
+            StationInformations.add(stationInformation);
+        }
+        return StationInformations;
     }
 
     @Override
@@ -197,7 +204,6 @@ public class StationFlowServiceImpl implements StationFlowService
             stationInformation.setTime(time);   // 设置时间
             stationInformation.setLatitude(stationDetail.getLatitude());    // 设置纬度
             stationInformation.setLongitude(stationDetail.getLongitude());  // 设置经度
-
             stationInformationList.add(stationInformation);
         }
 

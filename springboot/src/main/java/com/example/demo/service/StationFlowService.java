@@ -1,7 +1,7 @@
 package com.example.demo.service;
 
-import com.example.demo.pojo.entity.LineInformation;
 import com.example.demo.pojo.entity.StationInformation;
+import com.example.demo.pojo.table.LineFlow;
 import wniemiec.util.data.Pair;
 
 import java.util.List;
@@ -15,12 +15,12 @@ public interface StationFlowService
     // 传入特定线路的名称和时间，查询该线路在该时间时总的入站量和出站量
     // 线路总的入站量是线路上所有站点的入站量，线路总的出站量是线路上所有站点的出站量
     // 注意：这里传入的时间可能是表中没有的时间，请注意处理
-    Pair<Integer, Integer> getLineInOutNum(Integer lineName, String time);//已测试
+    Pair<Integer, Integer> getLineInOutNum(Integer lineName, String time);//已测试最新版
 
     // 传入特定线路的名称和时间，获取该线路在该天（注意不是该时间，应该取时间中的天作为判断）所有时间点的入站量和出站量
     // 返回类型是一个结构链表，该结构定义在pojo/entity中，包含线路名称，时间点，该时间点上的入站量和出站量
     // 该方法中，只需要设置结构中的名称，时间点，该时间点上的入站量和出站量，无需设置另外两个链表
-    List<LineInformation> getLineInOutNumAllDay(Integer lineName, String time);
+    List<LineFlow> getLineInOutNumAllDay(Integer lineName, String time);
 
     // 传入特定线路的名称和时间，获取该线路在该时间点的所有站点的：id，名称，入站量，出站量，经纬度，其它变量不存
     // 返回链表，元素是站点信息的实体类，注意传入的时间time需要转换
