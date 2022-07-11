@@ -187,7 +187,7 @@ public class StationFlowServiceImpl implements StationFlowService
         timeUtil.toApproachTime();
         time = timeUtil.getTime();
 
-        /* 查询该时间点所有站的flow信息,并按inNum【排序 */
+        /* 查询该时间点所有站的flow信息,并按inNum排序 */
         QueryWrapper<StationFlow> stationFlowQueryWrapper = new QueryWrapper<>();
         stationFlowQueryWrapper.eq("time", time).orderByDesc("inNum");
         List<StationFlow> stationFlowList = stationFlowMapper.selectList(stationFlowQueryWrapper);

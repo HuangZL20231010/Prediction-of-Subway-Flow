@@ -8,6 +8,8 @@ import com.example.demo.service.StationFlowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import wniemiec.util.data.Pair;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -89,5 +91,20 @@ public class StationFlowController
 
         List<StationInformation> stationInNumRank = stationFlowService.getStationInNumRank(time, 15);
         return Result.success(stationInNumRank);
+    }
+
+    @PostMapping("/getLineInNumByID")
+    @ResponseBody
+    public Result<?> getLineInNumByID(@RequestBody Integer lineID)
+    {
+        Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
+        String time = dateFormat.format(date); // 当前时间
+        String HMS = time.substring(11,19);
+        time="2015/04/29 "+ HMS;
+
+        List<Pair<String, Integer>> lineInnumAllTime = stationFlowService.getLineInnumAllTime(lineID, time);
+
+        return Result.success(lineInnumAllTime);
     }
 }
