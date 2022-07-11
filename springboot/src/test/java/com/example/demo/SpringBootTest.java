@@ -20,16 +20,16 @@ public class SpringBootTest {
     @Test
     public void test()
     {
-        List<String> lineNameList = new ArrayList<>();
-        QueryWrapper<StationDetail> queryMapper = new QueryWrapper<>();
-        List<StationDetail> stationDetailList = stationDetailMapper.selectList(queryMapper.orderByAsc("lineName"));
-        for (StationDetail stationDetail : stationDetailList)
-        {
-            if (lineNameList.contains(stationDetail.getLinename()))
-                continue;
-            lineNameList.add(stationDetail.getLinename());
-        }
-
-        System.out.print(lineNameList);
+//        List<String> lineNameList = new ArrayList<>();
+//        QueryWrapper<StationDetail> queryMapper = new QueryWrapper<>();
+//        List<StationDetail> stationDetailList = stationDetailMapper.selectList(queryMapper.orderByAsc("lineName"));
+//        for (StationDetail stationDetail : stationDetailList)
+//        {
+//            if (lineNameList.contains(stationDetail.getLinename()))
+//                continue;
+//            lineNameList.add(stationDetail.getLinename());
+//        }
+//
+//        System.out.print(lineNameList);
     }
 }

@@ -1,129 +1,28 @@
-<!--<template>-->
-
-<!--    <div id="container"></div>-->
-
-
-<!--</template>-->
-
-<!--<script>-->
-
-<!--import AMapLoader from '@amap/amap-jsapi-loader';-->
-
-
-<!--export default {-->
-
-<!--  data() {-->
-<!--    return {-->
-<!--      map: null, //初始化 map 对象-->
-<!--    }-->
-<!--  },-->
-<!--  methods: {-->
-<!--    initMap() {-->
-<!--      AMapLoader.load({-->
-<!--        key: "ed2ea36f8564541569c370254845d93d", //此处填入我们注册账号后获取的Key-->
-<!--        version:"2.0",      // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15-->
-<!--        plugins:['AMap.LineSearch'],       // 需要使用的的插件列表，如比例尺'AMap.Scale'等-->
-<!--      }).then((AMap) => {-->
-<!--        this.map = new AMap.Map("container", { //设置地图容器id-->
-<!--          viewMode: "3D", //是否为3D地图模式-->
-<!--          zoom: 11, //初始化地图级别-->
-<!--          mapStyle: 'amap://styles/blue',-->
-<!--          center: [121.430041,31.154579], //初始化地图中心点位置-->
-<!--        });-->
-<!--        this.lineSearch();-->
-<!--      }-->
-<!--      ).catch(e => {-->
-<!--        console.log(e);-->
-<!--      })-->
-<!--    },-->
-<!--    lineSearch() {-->
-<!--      var linesearch = null;-->
-<!--      linesearch = new AMap.LineSearch({-->
-<!--        pageIndex: 1,-->
-<!--        city: '西安',-->
-<!--        pageSize: 2,-->
-<!--        extensions: 'all'-->
-<!--      });-->
-
-<!--      let _this = this;-->
-<!--      linesearch.search('411', function(status, result) {-->
-<!--        _this.map.clearMap()-->
-<!--        if (status === 'complete' && result.info === 'OK') {-->
-<!--          console.log('result', result)-->
-<!--          _this.lineSearchData(result);-->
-<!--        } else {-->
-<!--          alert(result);-->
-<!--        }-->
-<!--      });-->
-<!--    },-->
-<!--    lineSearchData(data) {-->
-<!--      var lineArr = data.lineInfo;-->
-<!--      var lineNum = data.lineInfo.length;-->
-<!--      if (lineNum == 0) {-->
-<!--      } else {-->
-<!--        for (var i = 0; i < lineNum; i++) {-->
-<!--          var pathArr = lineArr[i].path;-->
-<!--          var stops = lineArr[i].via_stops;-->
-<!--          var startPot = stops[0].location;-->
-<!--          var endPot = stops[stops.length - 1].location;-->
-<!--          if (i == 0) //作为示例，只绘制一条线路-->
-<!--            this.drawbusLine(startPot, endPot, pathArr);-->
-<!--        }-->
-<!--      }-->
-<!--    },-->
-<!--    drawbusLine(startPot, endPot, BusArr) {-->
-<!--      //绘制起点，终点-->
-<!--      new AMap.Marker({-->
-<!--        map: this.map,-->
-<!--        position: startPot, //基点位置-->
-<!--        icon: "https://webapi.amap.com/theme/v1.3/markers/n/start.png",-->
-<!--        zIndex: 10-->
-<!--      });-->
-<!--      new AMap.Marker({-->
-<!--        map: this.map,-->
-<!--        position: endPot, //基点位置-->
-<!--        icon: "https://webapi.amap.com/theme/v1.3/markers/n/end.png",-->
-<!--        zIndex: 10-->
-<!--      });-->
-<!--      //绘制乘车的路线-->
-<!--      var busPolyline = null;-->
-<!--      busPolyline = new AMap.Polyline({-->
-<!--        map: this.map,-->
-<!--        path: BusArr,-->
-
-<!--        strokeColor: "#09f",//线颜色-->
-<!--        strokeOpacity: 0.8,//线透明度-->
-<!--        isOutline:true,-->
-<!--        outlineColor:'white',-->
-<!--        strokeWeight: 6//线宽-->
-<!--      });-->
-<!--      this.map.setFitView();-->
-<!--    }-->
-<!--  },-->
-
-<!--  mounted() {-->
-<!--    //DOM初始化完成进行地图初始化-->
-<!--    this.initMap();-->
-<!--  }-->
-<!--}-->
-
-<!--</script>-->
-
-<!--<style>-->
-<!--#map-container {width:300px; height: 180px; }-->
-
-<!--#container {-->
-<!--  width: 100%;-->
-<!--  height: 900px;-->
-<!--  margin: 0px;-->
-<!--  border: 1px;-->
-<!--}-->
-<!--</style>-->
-
-
 <template>
   <div >
 
+    <div>
+      <el-radio-group class="scope" v-model="radio1" @change="lineChange">
+        <el-radio-button @click="testclick"  label="1号线"></el-radio-button>
+        <el-radio-button label="2号线"></el-radio-button>
+        <el-radio-button label="3号线"></el-radio-button>
+        <el-radio-button label="4号线"></el-radio-button>
+        <el-radio-button label="5号线"></el-radio-button>
+        <el-radio-button label="6号线"></el-radio-button>
+        <el-radio-button label="7号线"></el-radio-button>
+      </el-radio-group>
+    </div>
+    <div>
+      <el-radio-group class="scope2" v-model="radio1" @change="lineChange">
+        <el-radio-button label="8号线"></el-radio-button>
+        <el-radio-button label="9号线"></el-radio-button>
+        <el-radio-button label="10号线"></el-radio-button>
+        <el-radio-button label="11号线"></el-radio-button>
+        <el-radio-button label="12号线"></el-radio-button>
+        <el-radio-button label="13号线"></el-radio-button>
+        <el-radio-button label="16号线"></el-radio-button>
+      </el-radio-group>
+    </div>
     <!--    card-->
     <transition  name="slide-fade" style="z-index: 10" >
 
@@ -144,18 +43,22 @@
               <el-table-column
                   style="background-color: rgba(31,97,167,0.6);font-weight: bolder"
 
-                  prop="rank"
+                  prop="stationID"
                   label="排名"
                   width="70">
               </el-table-column>
               <el-table-column
                   style="background-color: rgba(31,97,167,0.6)"
-                  prop="site"
+                  prop="name"
                   label="站点名称"
                   width="200">
+                <template slot-scope="scope">
+                  <!-- 注意：这个地方要传参数进去才能进行操作  函数名称(scope.row) -->
+                  <div @click="zoomsite(scope.row)">{{ scope.row.name }}</div>
+                </template>
               </el-table-column>
               <el-table-column
-                  prop="flow"
+                  prop="inNum"
                   label="预测人流量"
                   width="130">
               </el-table-column>
@@ -165,12 +68,12 @@
     </transition>
 
 
-    <div id="label">
+    <div id="label" @click="testclick">
       <p style="font-size: 20px;font-weight: bolder;color:white;
-      text-decoration: underline;letter-spacing:4px"
-      >
-        上海轨道交通客流量预测{{nowTime}}</p>
-      <el-button type="primary" size="small" autocomplete="off" @click="testclick()">弹窗测试</el-button>
+      text-decoration: underline;letter-spacing:4px">
+        上海轨道交通客流量预测</p>
+      <p style="color:white">{{nowTime}}</p>
+<!--      <el-button type="primary" size="small" autocomplete="off" @click="testclick()">弹窗测试</el-button>-->
     </div>
 
     <div id="container" ></div>
@@ -188,12 +91,15 @@ import AMapLoader from '@amap/amap-jsapi-loader';
 export default {
   data() {
     return {
+      radio1:'1号线',
       sites:['同济大学','上海南站','东方明珠'],
       clicktime:0,
-      nowTime:'',
+      nowTime:'22:00',
+      busPolyline:null,
       showw:true,
-      tableData: [{rank:1,site:"10号线",flow:6324},{rank:2,site:"5号线",flow:9324},{rank:3,site:"9号线",flow:3324}
-      ,{rank:4,site:"8号线",flow:7777},{rank:5,site:"3号线",flow:6344},{rank:6,site:"2号线",flow:1324},{rank:7,site:"12号线",flow:324}],
+      sitesinfo:[],
+      markerList : [],
+      tableData: [],
       map:null,
       mysubway: null,
     }
@@ -201,16 +107,73 @@ export default {
   mounted() {
     this.initMap();
     this.drawChart();
-
-
+    request.get('/api/StationFlow/getStationInNumRank').then(res =>{
+      this.tableData = res.data;
+      this.nowTime=this.tableData[0].time;
+    })
 
 },
   methods: {
-    testclick(){
-      var line = '2号线';
+    zoomsite(row) {
+      this.map.remove(this.markerList);
+      if(row.line!=this.radio1){
+        this.map.remove(this.busPolyline)
+        this.radio1=row.line;
+        this.lineSearch(this.radio1);
+      }
+
+
+    },
+
+    //描绘一整条线
+    Addpoint(line){
+      this.map.remove(this.markerList);
       request.post('/api/StationFlow/StationByLine',line).then(res =>{
+        // this.sitesinfo = res.data;
         console.log(res);
+        this.sitesinfo=res.data;
+        for(var i =0;i<this.sitesinfo.length;i++){
+          this.drawsite(this.sitesinfo[i].longitude,this.sitesinfo[i].latitude,i)
+        }
       })
+    },
+
+    lineChange(){
+      this.map.remove(this.busPolyline);
+      this.map.remove(this.markerList);
+      var linename= '地铁'+this.radio1;
+      if(this.radio1=='1号线'){
+        this.map.setCenter([121.45559270874024,31.247195689843117])
+        this.map.setZoom(12)
+        this.Addpoint(1);
+      }
+      if(this.radio1=='2号线'){
+        this.map.setCenter([121.44494970336915,31.218426406876784])
+        this.map.setZoom(13)
+        this.Addpoint(2);
+      }
+      if(this.radio1=='3号线'){
+        this.map.setCenter([121.48202856079102,31.29385374102983])
+        this.map.setZoom(11.5)
+        this.Addpoint(3);
+      }
+      if(this.radio1=='4号线'){
+        this.map.setCenter([ 121.48336,31.221424])
+        this.map.setZoom(13.2)
+        this.Addpoint(4);
+      }
+      this.lineSearch(linename);
+    },
+
+    testclick(){
+      // var line = '2';
+      // request.post('/api/StationFlow/StationByLine').then(res =>{
+      //   this.sitesinfo = res.data;
+      //   console.log(this.sitesinfo[0]);
+      // })
+      // for(var i =0;i<this.sitesinfo.length;i++){
+      //   this.searchsite(this.sitesinfo[i].name,i);
+      // }
       if(this.clicktime==0){
         this.showw = !this.showw;
         this.clicktime++;
@@ -219,10 +182,6 @@ export default {
         this.drawChart();
         this.clicktime=0;
       }
-      for(var i =0;i<this.sites.length;i++){
-        this.searchsite(this.sites[i]);
-      }
-
     },
     timeFormate(timeStamp) {
       let year = new Date(timeStamp).getFullYear();
@@ -260,13 +219,13 @@ export default {
         });
         this.map.addControl(new AMap.ToolBar());
         this.map.addControl(new AMap.Scale());
-        this.lineSearch();
+        this.lineSearch('1号线');
 
       }).catch(e=>{
         console.log(e);
       })
     },
-    lineSearch() {
+    lineSearch(line) {
       var linesearch = null;
        linesearch = new window.AMap.LineSearch({
          pageIndex: 1, // 第一页的线路
@@ -276,13 +235,13 @@ export default {
       })
 
       let _this = this;
-      var name = ['10号线','2号线','1号线'];
-      for(var i = 0; i < 3; i++){
+      var line = line;
+      for(var i = 0; i < 1; i++){
         var index=0;
-        linesearch.search(name[i], function(status, result) {
+        linesearch.search(line, function(status, result) {
           if (status === 'complete' && result.info === 'OK') {
             // 查询成功调用
-            console.log('ok')
+
             _this.lineSearchData(result,index)
             index++;
           } else {
@@ -311,16 +270,18 @@ export default {
     },
     drawbusLine(BusArr,index) {
       var index =index;
-      var colors=['blue','red','green'];
-      let busPolyline = new window.AMap.Polyline({
+      var colors=['pink','green'];
+      this.busPolyline = new window.AMap.Polyline({
         map: this.map,
         path: BusArr,
         strokeColor: colors[index],// 线颜色
-        strokeOpacity: 0.7,// 线透明度
+        strokeOpacity: 0.9,// 线透明度
         isOutline: false,
         outlineColor: 'white',
-        strokeWeight: 3 // 线宽
+        strokeWeight: 3.5 // 线宽
       })
+
+
     },
     //打开marker消息窗体
     openInfo(positionResult,pointData) {
@@ -329,12 +290,16 @@ export default {
       var input=6666;
       var output=3333;
       info.push("<div class='input-card content-window-card'>");
-      info.push("<div style=\"padding:7px 0px 0px 0px;color:red\"><h4>"+name);
+      info.push("<div style=\"padding:7px 0px 0px 0px;color:royalblue\"><h4>"+name);
       info.push("</h4><div class='input-item'>列车信息</div></div></div>");
-      info.push("<p class='input-item'>预测入站人数</p>");
-      info.push(input)
-      info.push("<p class='input-item'>预测出站人数</p></div></div>");
-      info.push(output)
+      if(pointData.in<500){info.push("<div><p style='color:green'>预测入站人数");}
+      if(pointData.in>=500&&pointData.in<1000){info.push("<div><p style='color:sandybrown'>预测入站人数");}
+      if(pointData.in>=1000){info.push("<div><p style='color:darkred'>预测入站人数");}
+      info.push(": "+pointData.in+"</p></div>")
+      if(pointData.out<500){info.push("<div><p style='color:green'>预测出站人数");}
+      if(pointData.out>=500&&pointData.out<1000){info.push("<div><p style='color:sandybrown'>预测出站人数");}
+      if(pointData.out>=1000){info.push("<div><p style='color:darkred'>预测出站人数");}
+      info.push(": "+pointData.out+"</p></div>")
 
       let infoWindow = new AMap.InfoWindow({
         content: info.join(""),
@@ -343,34 +308,38 @@ export default {
       infoWindow.open(this.map, positionResult.lnglat);
     },
 
-    searchsite(site) {
+    searchsite(site,i) {
+      var index=i;
       var site =site;
       var placeSearch = new AMap.PlaceSearch({ //构造地点查询类
         pageSize: 5,
         pageIndex: 1,
         city: "上海"//城市
       });
-//关键字查询
+      //关键字查询
       let _this = this;
       placeSearch.search(site, function(status, result) {
         var lat = result.poiList.pois[0].location.lat;
         var lng = result.poiList.pois[0].location.lng;
-        console.log(lat,lng);
-        _this.drawsite(lng,lat);
+        console.log(lat,lng,site);
+        _this.drawsite(lng,lat,index);
       })
 
     },
-    drawsite(lng,lat){
+    drawsite(lng,lat,index){
+      var index=index;
       let icon = new AMap.Icon({
-        size: new AMap.Size(10, 10), // 图标尺寸
-        image:
-            "//datav.oss-cn-hangzhou.aliyuncs.com/uploads/images/32a60b3e7d599f983aa1a604fb640d7e.gif" // Icon的图像
+        image: "C:\\Users\\Jarvis2K\\Desktop\\小学期2\\Workspace\\management\\src\\resource\\reddot200.gif",
+        size: new AMap.Size(52, 52),  //图标大小
+        imageSize: new AMap.Size(200,200)
       });
       var marker = new window.AMap.Marker({
         position: [lng,lat],
         map:this.map,
-        icon: icon,
-        extData : {"name":"上海南站"}
+        // icon: icon,
+        icon:require("C:\\Users\\Jarvis2K\\Desktop\\小学期2\\Workspace\\management\\src\\resource\\reddot100.gif"),
+        offset: new AMap.Pixel(-50, -50),
+        extData : {"name":this.sitesinfo[index].name,"in":this.sitesinfo[index].inNum,"out":this.sitesinfo[index].outNum}
       });
     //     marker.on("click", () => {
     //   console.log(this.lnglatData[i]);
@@ -394,7 +363,7 @@ export default {
         this.openInfo( positionResult ,pointData);
       });
 
-
+    this.markerList.push(marker);
     this.map.add(marker);
     },
     drawChart() {
@@ -550,8 +519,26 @@ export default {
   height: 85%;
   position: absolute;
   right: 10px;
-  top:100px;
+  top:80px;
   transition: 1s linear;
+  background-color: rgba(31,97,167,0.6);
+  /*background-color: #0d5ab1;*/
+  z-index: 10;
+}
+
+.scope {
+  position: absolute;
+  left: 10px;
+  top:90px;
+  background-color: rgba(31,97,167,0.6);
+  /*background-color: #0d5ab1;*/
+  z-index: 10;
+}
+
+.scope2 {
+  position: absolute;
+  left: 10px;
+  top:130px;
   background-color: rgba(31,97,167,0.6);
   /*background-color: #0d5ab1;*/
   z-index: 10;
@@ -559,14 +546,14 @@ export default {
 
   #label{
   position: absolute;
-    right: 850px;
-    top:120px;
+    right: 650px;
+    top:100px;
     z-index: 10;
 }
 
   #container {
   width: 100%;
-  height: 700px;
+  height: 725px;
     z-index: 0;
   margin-top: 0px;
   border: 0px;
@@ -610,6 +597,11 @@ export default {
   background-color: transparent !important;
 }
 
+.info-middle  {
+  float: left;
+  margin-right: 6px;
+  background-color: #0d5ab1;
+}
 
 /deep/.el-table__body-wrapper::-webkit-scrollbar{
   width: 0;
