@@ -32,9 +32,9 @@ public class StationFlowController
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
         String time = dateFormat.format(date); // 当前时间
-        String HMS = time.substring(11, 18);
-        time = "2015/04/29 " + HMS;
-
+        String HMS = time.substring(11,19);
+        time="2015/04/29 "+HMS;
+        System.out.println(time);
         List<StationInformation> stationInfoInLineByTime = stationFlowService.getStationInfoInLineByTime(lineName, time);
 
         return Result.success(stationInfoInLineByTime);
@@ -58,6 +58,8 @@ public class StationFlowController
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
         String time = dateFormat.format(date); // 当前时间
+        String HMS = time.substring(11,19);
+        time="2015/04/29 "+HMS;
         List<Integer> linesNameList = stationDetailService.selectLinesName();    // 所有线路的名称
         List<LineInformationAllTime> lineInformationAllTimeList = new ArrayList<>();    // 最后返回的链表，存储结构体
 
@@ -82,6 +84,8 @@ public class StationFlowController
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
         String time = dateFormat.format(date); // 当前时间
+        String HMS = time.substring(11,19);
+        time="2015/04/29 "+HMS;
 
         List<StationInformation> stationInNumRank = stationFlowService.getStationInNumRank(time, 15);
         return Result.success(stationInNumRank);
