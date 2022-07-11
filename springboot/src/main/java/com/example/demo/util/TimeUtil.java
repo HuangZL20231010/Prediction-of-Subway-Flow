@@ -19,7 +19,6 @@ public class TimeUtil
         char[] t = time.toCharArray();
         char a=t[t.length-4];
         char b=t[t.length-5];
-
         if (a >= '5'&&b<'5') {
             t[t.length - 5] = (char) (t[t.length - 5] + 1);
         }
