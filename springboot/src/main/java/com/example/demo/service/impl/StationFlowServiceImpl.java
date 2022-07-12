@@ -211,7 +211,7 @@ public class StationFlowServiceImpl implements StationFlowService
     }
 
     @Override
-    public List<StationFlow> getStationInOutNum(Integer stationID, String time)
+    public List<StationFlow> getStationInOutNumAllTime(Integer stationID, String time)
     {
         Integer inNumSum = 0;   // 一整天的入站量之和
         Integer outNumSum = 0;  // 一整天的出站量之和

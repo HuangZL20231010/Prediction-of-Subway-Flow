@@ -123,7 +123,7 @@ public class StationFlowController
         return Result.success(lineInnumAllTime);
     }
 
-    // 传入站点id，得到该站点在一整天总的入站量和出站量
+    // 传入站点id，得到该站点在一整天所有时间点的入站量和出站量
     @GetMapping("/getStationInOutNumByID/{stationID}")
     @ResponseBody
     public Result<?> getStationInOutNumByID(@PathVariable("stationID") Integer stationID)
@@ -135,6 +135,6 @@ public class StationFlowController
         String HMS = time.substring(11,19);
         time="2015/04/29 "+ HMS;
 
-        return Result.success(stationFlowService.getStationInOutNum(stationID, time));
+        return Result.success(stationFlowService.getStationInOutNumAllTime(stationID, time));
     }
 }

@@ -39,6 +39,6 @@ public interface StationFlowService
     List<StationInformation> getStationInNumRank(String time, Integer number);
 
     // 传入站点的ID和时间，传回该站点一整天所有时间点的入站量和出站量
-    List<StationFlow> getStationInOutNum(Integer stationID, String time);
+    List<StationFlow> getStationInOutNumAllTime(Integer stationID, String time);
 
 }
