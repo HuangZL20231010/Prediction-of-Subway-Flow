@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import wniemiec.util.data.Pair;
+
+import javax.websocket.server.PathParam;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -28,9 +30,9 @@ public class StationFlowController
 
     // 传入线路名称，返回当前时间该线路上所有站点的经纬度和入站量，出站量等信息
     // 有time参数版,传进来的time格式为05:10，肯定为整数
-    @PostMapping("/StationByLine")
+    @GetMapping( value = {"/StationByline/{lineName}/{time}", "/StationByline/{lineName}"})
     @ResponseBody
-    public Result<?> getStationInformationByLineName( @RequestBody Integer lineName, @RequestBody(required = false) String time)
+    public Result<?> getStationInformationByLineName(@PathVariable(value = "lineName") Integer lineName, @PathVariable(value = "time", required = false) String time)
     {
         if (time != null)
         {
@@ -56,15 +58,17 @@ public class StationFlowController
     }
 
 
-    // 传入线路名称和时间，返回该时间时间该线路上所有站点的经纬度和入站量，出站量等信息
-    @PostMapping ("/StationByLineTime")
-    @ResponseBody
-    public Result<?> getStationInformationInLine(@RequestBody Integer lineName, @RequestBody String time)
-    {
-        List<StationInformation> stationInfoInLineByTime = stationFlowService.getStationInfoInLineByTime(lineName, time);
-
-        return Result.success(stationInfoInLineByTime);
-    }
+//    // 传入线路名称和时间，返回该时间时间该线路上所有站点的经纬度和入站量，出站量等信息
+//    @PostMapping ("/StationByLineTime/{lineName}/{time}")
+//    @ResponseBody
+//    public Result<?> getStationInformationInLine(@PathVariable("lineName") Integer lineName, @PathVariable("time") String time)
+//    {
+//        time = "2015/04/29 " + time + ":00";
+//
+//        List<StationInformation> stationInfoInLineByTime = stationFlowService.getStationInfoInLineByTime(lineName, time);
+//
+//        return Result.success(stationInfoInLineByTime);
+//    }
 
     // 接受前端请求，返回该天所有线路的所有时间点的客运量
     @GetMapping("/AllStationsPFlowDay")
@@ -118,9 +122,9 @@ public class StationFlowController
         return Result.success(stationInNumRank);
     }
 
-    @PostMapping("/getLineInNumByID")
+    @GetMapping(value = "/getLineInNumByID/{lineID}")
     @ResponseBody
-    public Result<?> getLineInNumByID(@RequestBody Integer lineID)
+    public Result<?> getLineInNumByID(@PathVariable("lineID") Integer lineID)
     {
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
