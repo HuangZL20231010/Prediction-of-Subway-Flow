@@ -1,8 +1,10 @@
 package com.example.demo.pojo.entity;
 
+
 public class StationInformation
 {
     private Integer stationID;   // 站点的id
+    private Integer lineID; // 所属线路的id
     private String name;    // 站点的名称
     private String time;    // 时间
     private Integer inNum;   // 入站量
@@ -65,4 +67,14 @@ public class StationInformation
     public void setLongitude(String longitude) {
         this.longitude = longitude;
     }
+
+    public Integer getLineID() {
+        return lineID;
+    }
+
+    public void setLineID(Integer lineID) {
+        this.lineID = lineID;
+    }
+
+
 }

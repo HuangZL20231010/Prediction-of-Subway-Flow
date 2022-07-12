@@ -204,6 +204,7 @@ public class StationFlowServiceImpl implements StationFlowService
             stationInformation.setTime(time);   // 设置时间
             stationInformation.setLatitude(stationDetail.getLatitude());    // 设置纬度
             stationInformation.setLongitude(stationDetail.getLongitude());  // 设置经度
+            stationInformation.setLineID(stationDetail.getLinename());  // 设置线路id
             stationInformationList.add(stationInformation);
         }
 
