@@ -211,7 +211,7 @@ public class StationFlowServiceImpl implements StationFlowService
     }
 
     @Override
-    public Pair<Integer, Integer> getStationInOutNum(Integer stationID, String time)
+    public List<StationFlow> getStationInOutNum(Integer stationID, String time)
     {
         Integer inNumSum = 0;   // 一整天的入站量之和
         Integer outNumSum = 0;  // 一整天的出站量之和
@@ -229,13 +229,7 @@ public class StationFlowServiceImpl implements StationFlowService
         stationFlowQueryWrapper.like("time", YMD).eq("stationID", stationID);
         List<StationFlow> stationFlowList = stationFlowMapper.selectList(stationFlowQueryWrapper);
 
-        for (StationFlow stationFlow : stationFlowList)
-        {
-            inNumSum += stationFlow.getInnum();
-            outNumSum += stationFlow.getOutnum();
-        }
-
-        return new Pair<>(inNumSum, outNumSum);
+        return stationFlowList;
 
     }
 }
