@@ -123,6 +123,7 @@ public class StationFlowController
         return Result.success(lineInnumAllTime);
     }
 
+    // 传入站点id，得到该站点在一整天总的入站量和出站量
     @GetMapping("/getStationInOutNumByID/{stationID}")
     @ResponseBody
     public Result<?> getStationInOutNumByID(@PathVariable("stationID") Integer stationID)
