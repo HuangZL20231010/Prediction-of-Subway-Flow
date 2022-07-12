@@ -37,4 +37,7 @@ public interface StationFlowService
     // 传入时间和排行数目，获取全部地铁站的人流量排行
     List<StationInformation> getStationInNumRank(String time, Integer number);
 
+    // 传入站点的ID和时间，传回该站点一整天的入站量和出站量
+    Pair<Integer, Integer> getStationInOutNum(Integer stationID, String time);
+
 }
