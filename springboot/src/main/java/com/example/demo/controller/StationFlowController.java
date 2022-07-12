@@ -10,8 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import wniemiec.util.data.Pair;
-
-import javax.websocket.server.PathParam;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -57,18 +55,6 @@ public class StationFlowController
         return Result.success(stationInfoInLineByTime);
     }
 
-
-//    // 传入线路名称和时间，返回该时间时间该线路上所有站点的经纬度和入站量，出站量等信息
-//    @PostMapping ("/StationByLineTime/{lineName}/{time}")
-//    @ResponseBody
-//    public Result<?> getStationInformationInLine(@PathVariable("lineName") Integer lineName, @PathVariable("time") String time)
-//    {
-//        time = "2015/04/29 " + time + ":00";
-//
-//        List<StationInformation> stationInfoInLineByTime = stationFlowService.getStationInfoInLineByTime(lineName, time);
-//
-//        return Result.success(stationInfoInLineByTime);
-//    }
 
     // 接受前端请求，返回该天所有线路的所有时间点的客运量
     @GetMapping("/AllStationsPFlowDay")
@@ -135,5 +121,20 @@ public class StationFlowController
         List<Pair<String, Integer>> lineInnumAllTime = stationFlowService.getLineInnumAllTime(lineID, time);
 
         return Result.success(lineInnumAllTime);
+    }
+
+    // 传入站点id，得到该站点在一整天总的入站量和出站量
+    @GetMapping("/getStationInOutNumByID/{stationID}")
+    @ResponseBody
+    public Result<?> getStationInOutNumByID(@PathVariable("stationID") Integer stationID)
+    {
+        /* 处理时间 */
+        Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        String time = dateFormat.format(date); // 当前时间
+        String HMS = time.substring(11,19);
+        time="2015/04/29 "+ HMS;
+
+        return Result.success(stationFlowService.getStationInOutNum(stationID, time));
     }
 }

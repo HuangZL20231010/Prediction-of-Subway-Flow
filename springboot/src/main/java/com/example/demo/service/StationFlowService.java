@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import com.example.demo.pojo.entity.StationInformation;
 import com.example.demo.pojo.table.LineFlow;
+import com.example.demo.pojo.table.StationFlow;
 import wniemiec.util.data.Pair;
 
 import java.util.List;
@@ -36,5 +37,8 @@ public interface StationFlowService
 
     // 传入时间和排行数目，获取全部地铁站的人流量排行
     List<StationInformation> getStationInNumRank(String time, Integer number);
+
+    // 传入站点的ID和时间，传回该站点一整天所有时间点的入站量和出站量
+    List<StationFlow> getStationInOutNum(Integer stationID, String time);
 
 }

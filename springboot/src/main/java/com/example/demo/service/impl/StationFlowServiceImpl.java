@@ -14,7 +14,6 @@ import com.example.demo.util.TimeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import wniemiec.util.data.Pair;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -209,5 +208,28 @@ public class StationFlowServiceImpl implements StationFlowService
         }
 
         return stationInformationList;
+    }
+
+    @Override
+    public List<StationFlow> getStationInOutNum(Integer stationID, String time)
+    {
+        Integer inNumSum = 0;   // 一整天的入站量之和
+        Integer outNumSum = 0;  // 一整天的出站量之和
+        String YMD; // 年月日
+
+        /* 处理时间 */
+        TimeUtil timeUtil = new TimeUtil();
+        timeUtil.setTime(time);
+        timeUtil.toApproachTime();
+        time = timeUtil.getTime();
+        YMD = time.substring(0, 10);
+
+        /* 查询该站点在一整天的flow信息 */
+        QueryWrapper<StationFlow> stationFlowQueryWrapper = new QueryWrapper<>();
+        stationFlowQueryWrapper.like("time", YMD).eq("stationID", stationID);
+        List<StationFlow> stationFlowList = stationFlowMapper.selectList(stationFlowQueryWrapper);
+
+        return stationFlowList;
+
     }
 }
