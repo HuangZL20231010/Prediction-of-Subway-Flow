@@ -89,20 +89,27 @@ public class StationFlowController
         return Result.success(lineInformationAllTimeList);
     }
 
-    @GetMapping("/getStationInNumRank")
+    @GetMapping(value = {"/getStationInNumRank", "/getStationInNumRank/{time}"})
     @ResponseBody
-    public Result<?> getStationInNumRank()
+    public Result<?> getStationInNumRank(@PathVariable(value = "time", required = false) String time)
     {
-        /* 获得当前时间 */
-        Date date = new Date();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-        String time = dateFormat.format(date); // 当前时间
+        if (time != null)
+        {
+            time = "2015/04/29 " + time + ":00";
+        }
+        else
+        {
+            /* 获得当前时间 */
+            Date date = new Date();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            time = dateFormat.format(date); // 当前时间
 
-        /* 处理时间 */
-        TimeUtil timeUtil = new TimeUtil();
-        timeUtil.setTime(time);
-        timeUtil.toApproachTime();
-        time = timeUtil.getTime();
+            /* 处理当前时间 */
+            TimeUtil timeUtil = new TimeUtil();
+            timeUtil.setTime(time);
+            timeUtil.toApproachTime();
+            time = timeUtil.getTime();
+        }
 
         List<StationInformation> stationInNumRank = stationFlowService.getStationInNumRank(time, 15);
         return Result.success(stationInNumRank);
