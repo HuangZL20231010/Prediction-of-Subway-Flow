@@ -1,6 +1,5 @@
 <template>
   <div >
-
     <div>
       <el-radio-group class="scope" v-model="radio1" @change="lineChange">
         <el-radio-button @click="testclick"  label="1号线"></el-radio-button>
@@ -23,17 +22,35 @@
         <el-radio-button label="16号线"></el-radio-button>
       </el-radio-group>
     </div>
+    <div>
+      <el-time-select
+          class="scope3"
+          style="width: 150px"
+          v-model="selectime"
+          @change="choosetime()"
+          :picker-options="{
+    start: '05:00',
+    step: '00:10',
+    end: '22:40'
+  }"
+          placeholder="选择时间">
+      </el-time-select>
+    </div>
     <!--    card-->
     <transition  name="slide-fade" style="z-index: 10" >
 
         <el-card v-if='showw' class="box-card" style="background-color: rgba(31,97,167,0.6);">
           <div slot="header" class="clearfix">
-            <span style="color: white;font-weight: bolder;font-size: 20px;margin-bottom: 20px">今日客流量预测</span>
+            <span style="color: white;font-weight: bolder;font-size: 20px;margin-bottom: 20px">今日客流量预测 站点名： {{chartsitename}}</span>
             <div id="main" style="width: 430px; height: 300px"></div>
           </div>
           <div>
             <span style="color: white;font-weight: bolder;font-size: 20px">预测流量排行</span>
             <el-table
+                v-loading="loading"
+                element-loading-text="拼命加载中"
+                element-loading-spinner="el-icon-loading"
+                element-loading-background="rgba(0, 0, 0, 0.8)"
                 :header-cell-style="{background:'#206cbb',color:'#ffffff',fontWeight:'bolder',fontSize: '16px'}"
                 :cell-style="{color:'#ffffff',fontSize: '16px'}"
                 :data="tableData"
@@ -72,7 +89,7 @@
       <p style="font-size: 20px;font-weight: bolder;color:white;
       text-decoration: underline;letter-spacing:4px">
         上海轨道交通客流量预测</p>
-      <p style="color:white">{{nowTime}}</p>
+      <p style="color:white">{{nowDate}}</p>
 <!--      <el-button type="primary" size="small" autocomplete="off" @click="testclick()">弹窗测试</el-button>-->
     </div>
 
@@ -91,10 +108,18 @@ import AMapLoader from '@amap/amap-jsapi-loader';
 export default {
   data() {
     return {
+      chartdatain:[],
+      chartdataout:[],
+      chartsitename:'未选择',
+      selectime:'',
+      nowDate: null,
+      nowtimer: "",
       radio1:'1号线',
       sites:['同济大学','上海南站','东方明珠'],
       clicktime:0,
       nowTime:'22:00',
+      xzhou:[],
+      data1:[],
       busPolyline:null,
       showw:true,
       sitesinfo:[],
@@ -103,6 +128,9 @@ export default {
       map:null,
       mysubway: null,
     }
+  },
+  created() {
+    this.nowtimer = setInterval(this.gettime, 1000);
   },
   mounted() {
     this.initMap();
@@ -114,6 +142,23 @@ export default {
 
 },
   methods: {
+    choosetime(){
+      console.log(this.selectime)
+      if(this.radio1.length==3){var line =parseInt(this.radio1.charAt(0))}
+      if(this.radio1.length==4){var line =parseInt(this.radio1.substring(0,2))}
+      request.get('/api/StationFlow/StationByline/'+line+'/'+this.selectime).then(res =>{
+        // this.sitesinfo = res.data;
+        console.log(res);
+        this.sitesinfo=res.data;
+        this.map.remove(this.markerList);
+        for(var i =0;i<this.sitesinfo.length;i++){
+          this.drawsite(this.sitesinfo[i].longitude,this.sitesinfo[i].latitude,i)
+        }
+      })
+    },
+    gettime() {
+      this.nowDate = new Date().toLocaleString();
+    },
     zoomsite(row) {
       this.map.remove(this.markerList);
       if(row.line!=this.radio1){
@@ -128,7 +173,7 @@ export default {
     //描绘一整条线
     Addpoint(line){
       this.map.remove(this.markerList);
-      request.post('/api/StationFlow/StationByLine',line).then(res =>{
+      request.get('/api/StationFlow/StationByline/'+line).then(res =>{
         // this.sitesinfo = res.data;
         console.log(res);
         this.sitesinfo=res.data;
@@ -137,8 +182,17 @@ export default {
         }
       })
     },
-
+    qingqiu(line){
+      request.post('/api/StationFlow/getLineInNumByID',line).then(res =>{
+        for(var i=0;i<res.data.length-1;i++){
+          this.xzhou.push(res.data[i].first);
+          this.data1.push(res.data[i].second);
+        }
+        this.drawChart();
+      })
+    },
     lineChange(){
+      this.selectime=null;
       this.map.remove(this.busPolyline);
       this.map.remove(this.markerList);
       var linename= '地铁'+this.radio1;
@@ -146,6 +200,7 @@ export default {
         this.map.setCenter([121.45559270874024,31.247195689843117])
         this.map.setZoom(12)
         this.Addpoint(1);
+        // this.qingqiu(1);
       }
       if(this.radio1=='2号线'){
         this.map.setCenter([121.44494970336915,31.218426406876784])
@@ -162,10 +217,65 @@ export default {
         this.map.setZoom(13.2)
         this.Addpoint(4);
       }
+      if(this.radio1=='5号线'){
+        this.map.setCenter([ 121.43856,31.03321])
+        this.map.setZoom(11.2)
+        this.Addpoint(5);
+      }
+      if(this.radio1=='6号线'){
+        this.map.setCenter([ 121.533713,31.234293])
+        this.map.setZoom(12.2)
+        this.Addpoint(6);
+      }
+      if(this.radio1=='7号线'){
+        this.map.setCenter([ 121.48336,31.221424])
+        this.map.setZoom(13.2)
+        this.Addpoint(7);
+      }
+      if(this.radio1=='8号线'){
+        this.map.setCenter([ 121.48336,31.221424])
+        this.map.setZoom(13.2)
+        this.Addpoint(8);
+      }
+      if(this.radio1=='9号线'){
+        this.map.setCenter([121.439427,31.159294])
+        this.map.setZoom(11.2)
+        this.Addpoint(9);
+      }
+      if(this.radio1=='10号线'){
+        this.map.setCenter([ 121.497635,31.267927])
+        this.map.setZoom(11.2)
+        this.Addpoint(10);
+      }
+      if(this.radio1=='11号线'){
+        this.map.setCenter([ 121.425343,31.228269])
+        this.map.setZoom(11.2)
+        this.Addpoint(11);
+      }
+      if(this.radio1=='12号线'){
+        this.map.setCenter([ 121.48336,31.221424])
+        this.map.setZoom(12.2)
+        this.Addpoint(12);
+      }
+      if(this.radio1=='13号线'){
+        this.map.setCenter([121.403703,31.230279])
+        this.map.setZoom(13.2)
+        this.Addpoint(13);
+      }
+      if(this.radio1=='16号线'){
+        this.map.setCenter([ 121.728256,31.061244])
+        this.map.setZoom(12.2)
+        this.Addpoint(16);
+      }
+
       this.lineSearch(linename);
     },
 
     testclick(){
+      request.post('/api/StationFlow/getLineInNumByID',1).then(res =>{
+        // this.sitesinfo = res.data;
+        console.log(res);
+      })
       // var line = '2';
       // request.post('/api/StationFlow/StationByLine').then(res =>{
       //   this.sitesinfo = res.data;
@@ -292,13 +402,13 @@ export default {
       info.push("<div class='input-card content-window-card'>");
       info.push("<div style=\"padding:7px 0px 0px 0px;color:royalblue\"><h4>"+name);
       info.push("</h4><div class='input-item'>列车信息</div></div></div>");
-      if(pointData.in<500){info.push("<div><p style='color:green'>预测入站人数");}
-      if(pointData.in>=500&&pointData.in<1000){info.push("<div><p style='color:sandybrown'>预测入站人数");}
-      if(pointData.in>=1000){info.push("<div><p style='color:darkred'>预测入站人数");}
+      if(pointData.in<100){info.push("<div><p style='color:green'>预测入站人数");}
+      if(pointData.in>=100&&pointData.in<400){info.push("<div><p style='color:sandybrown'>预测入站人数");}
+      if(pointData.in>=400){info.push("<div><p style='color:darkred'>预测入站人数");}
       info.push(": "+pointData.in+"</p></div>")
-      if(pointData.out<500){info.push("<div><p style='color:green'>预测出站人数");}
-      if(pointData.out>=500&&pointData.out<1000){info.push("<div><p style='color:sandybrown'>预测出站人数");}
-      if(pointData.out>=1000){info.push("<div><p style='color:darkred'>预测出站人数");}
+      if(pointData.out<100){info.push("<div><p style='color:green'>预测出站人数");}
+      if(pointData.out>=100&&pointData.out<400){info.push("<div><p style='color:sandybrown'>预测出站人数");}
+      if(pointData.out>=400){info.push("<div><p style='color:darkred'>预测出站人数");}
       info.push(": "+pointData.out+"</p></div>")
 
       let infoWindow = new AMap.InfoWindow({
@@ -306,6 +416,11 @@ export default {
         offset: new AMap.Pixel(10, -25)
       });
       infoWindow.open(this.map, positionResult.lnglat);
+      this.chartsitename=pointData.name;
+      request.get('/api/StationFlow/getStationInOutNumByID/'+pointData.id).then(res =>{
+        console.log(res);
+        this.sitesinfo=res.data;
+      })
     },
 
     searchsite(site,i) {
@@ -328,6 +443,18 @@ export default {
     },
     drawsite(lng,lat,index){
       var index=index;
+      if(this.sitesinfo[index].inNum+this.sitesinfo[index].outNum<400){
+        var icon1=require("C:\\Users\\Jarvis2K\\Desktop\\小学期2\\Workspace\\management\\src\\resource\\green.gif");
+        var off =new AMap.Pixel(-25, -50);
+      }
+      if(this.sitesinfo[index].inNum+this.sitesinfo[index].outNum>=400&&this.sitesinfo[index].inNum+this.sitesinfo[index].outNum<700){
+        var icon1=require("C:\\Users\\Jarvis2K\\Desktop\\小学期2\\Workspace\\management\\src\\resource\\yellow.gif");
+        var off =new AMap.Pixel(-25, -50);
+      }
+      if(this.sitesinfo[index].inNum+this.sitesinfo[index].outNum>=700){
+        var icon1=require("C:\\Users\\Jarvis2K\\Desktop\\小学期2\\Workspace\\management\\src\\resource\\red.gif");
+        var off =new AMap.Pixel(-25, -25);
+      }
       let icon = new AMap.Icon({
         image: "C:\\Users\\Jarvis2K\\Desktop\\小学期2\\Workspace\\management\\src\\resource\\reddot200.gif",
         size: new AMap.Size(52, 52),  //图标大小
@@ -337,9 +464,10 @@ export default {
         position: [lng,lat],
         map:this.map,
         // icon: icon,
-        icon:require("C:\\Users\\Jarvis2K\\Desktop\\小学期2\\Workspace\\management\\src\\resource\\reddot100.gif"),
-        offset: new AMap.Pixel(-50, -50),
-        extData : {"name":this.sitesinfo[index].name,"in":this.sitesinfo[index].inNum,"out":this.sitesinfo[index].outNum}
+        icon:icon1,
+        offset: off,
+        extData : {"name":this.sitesinfo[index].name,"in":this.sitesinfo[index].inNum,"out":this.sitesinfo[index].outNum,
+          'id':this.sitesinfo[index].stationID,'time':this.sitesinfo[index].time}
       });
     //     marker.on("click", () => {
     //   console.log(this.lnglatData[i]);
@@ -422,7 +550,7 @@ export default {
             interval: 0  //设置 X 轴数据间隔几个显示一个，为0表示都显示
           },
           boundaryGap: false, //数据从 Y 轴起始
-          data: ['6时', '8时', '10时', '12时', '14时', '16时', '18时', '20时', '22时', '24时', ]
+          data: this.xzhou,
         },
 
         yAxis: {
@@ -431,6 +559,9 @@ export default {
           min: 0, // 配置 Y 轴刻度最小值
           max: 4000,  // 配置 Y 轴刻度最大值
           splitNumber: 7,  // 配置 Y 轴数值间隔
+          splitLine: { //网格线
+            show: true
+          },
           axisLine: {
             lineStyle: {   // Y 轴颜色配置
               color: '#ffffff'
@@ -441,7 +572,8 @@ export default {
         series: [
           {
             name: '猜想',
-            data: [454, 226, 891, 978, 901, 581, 400, 543, 272, 955, 1294, 1581],
+            // data: this.data1,
+            data:[],
             type: 'line',
             symbolSize: function (value) {  // 点的大小跟随数值增加而变大
               return value / 150;
@@ -543,6 +675,15 @@ export default {
   /*background-color: #0d5ab1;*/
   z-index: 10;
 }
+.scope3 {
+  position: absolute;
+  /*width: 10px;*/
+  left: 10px;
+  top:170px;
+  background-color: rgba(31,97,167,0.6);
+  /*background-color: #0d5ab1;*/
+  z-index: 10;
+}
 
   #label{
   position: absolute;
@@ -550,6 +691,7 @@ export default {
     top:100px;
     z-index: 10;
 }
+
 
   #container {
   width: 100%;

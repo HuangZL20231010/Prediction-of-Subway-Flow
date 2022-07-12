@@ -1,16 +1,72 @@
 <template>
-<div style="background-color: #033447;height: 100%">
-  <div id="main" style="width: 100%; height: 780px"></div>
-</div>
+  <div style="background-color: #033447;height: 100%">
+    <div
+        v-loading="loading"
+        element-loading-text="拼命加载中"
+        element-loading-spinner="el-icon-loading"
+        element-loading-background="rgba(0, 0, 0, 0.8)"
+        id="main" style="width: 100%; height: 780px"></div>
+    <el-button type="primary" size="small" autocomplete="off" @click="testclick()">弹窗测试</el-button>
+  </div>
 </template>
 
 <script>
+import request from "@/utils/request";
+
 export default {
   name: "overview",
+  data(){
+    return{
+      data1:[[],[],[],[],[]],
+      xzhou:[],
+
+
+    }
+  },
   mounted() {
     this.drawChart();
+    request.get('/api/StationFlow/getLineInNumByID/'+'1').then(res =>{
+      for(var i=0;i<res.data.length-1;i++){
+        this.xzhou.push(res.data[i].first);
+        this.data1[0].push(res.data[i].second);
+      }
+    })
+    this.qingqiu(2);
+    this.qingqiu(3);
+    this.openFullScreen2();
+  },
+  watch: {
+    //监听的变量名
+    data1:{
+      handler(newName, oldName) {
+        this.drawChart();
+      },
+      immediate: true
+    }
   },
   methods:{
+    openFullScreen2() {
+      const loading = this.$loading({
+        lock: true,
+        text: 'Loading',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)'
+      });
+      setTimeout(() => {
+        loading.close();
+      }, 5000);
+    },
+    qingqiu(line){
+      request.get('/api/StationFlow/getLineInNumByID/'+line).then(res =>{
+        for(var i=0;i<res.data.length-1;i++){
+          this.data1[line-1].push(res.data[i].second);
+        }
+        console.log(this.data1[1])
+      })
+    },
+    testclick(){
+      this.drawChart();
+    },
     drawChart() {
       // 基于准备好的dom，初始化echarts实例  这个和上面的main对应
       let myChart = this.$echarts.init(document.getElementById("main"));
@@ -50,7 +106,9 @@ export default {
         },
         toolbox: {   // 右上角的工具框（下一章展开讲）
           feature: {
-            saveAsImage: {} //下载按钮
+            saveAsImage: {
+              color: '#ffffff'
+            } //下载按钮
           }
         },
 
@@ -64,17 +122,17 @@ export default {
           },
           axisLabel: {
             rotate: 45, // X 轴标签文字旋转角度
-            interval: 3  //设置 X 轴数据间隔几个显示一个，为0表示都显示
+            interval: 10  //设置 X 轴数据间隔几个显示一个，为0表示都显示
           },
           boundaryGap: false, //数据从 Y 轴起始
-          data: ['6时', '8时', '10时', '12时', '14时', '16时', '18时', '20时', '22时', '24时', ]
+          data: this.xzhou,
         },
 
         yAxis: {
           name: '人次',
           type: 'value',
           min: 0, // 配置 Y 轴刻度最小值
-          max: 4000,  // 配置 Y 轴刻度最大值
+          max: 35000,  // 配置 Y 轴刻度最大值
           splitNumber: 7,  // 配置 Y 轴数值间隔
           axisLine: {
             lineStyle: {   // Y 轴颜色配置
@@ -86,7 +144,7 @@ export default {
         series: [
           {
             name: '一号线',
-            data: [454, 226, 891, 978, 901, 581, 400, 543, 272, 955, 1294, 1581],
+            data: this.data1[0],
             type: 'line',
             symbolSize: 8,
             itemStyle: {
@@ -104,7 +162,7 @@ export default {
 
           {
             name: '二号线',
-            data: [2455, 2534, 2360, 2301, 2861, 2181, 1944, 2197, 1745, 1810, 2283, 2298],
+            data: this.data1[1],
             type: 'line',
             symbolSize: 8,  //设置折线上圆点大小
             itemStyle: {
@@ -122,7 +180,7 @@ export default {
 
           {
             name: '三号线',
-            data: [1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3],
+            data: this.data1[2],
             type: 'line',
             symbolSize: 8,
             itemStyle: {
