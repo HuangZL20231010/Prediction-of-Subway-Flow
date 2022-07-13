@@ -189,14 +189,18 @@ public class StationFlowController
 
         /* 根据站点id检索站点相关信息 */
         StationFlow stationFlow = stationFlowMapper.selectOne(new QueryWrapper<StationFlow>().eq("stationID", stationID).eq("time", time));
+        QueryWrapper<CongestionResult> congestionResultQueryWrapper = new QueryWrapper<>();
+        congestionResultQueryWrapper.eq("stationID", stationID).eq("time", time);
+        CongestionResult congestionResult = congestionResultMapper.selectOne(congestionResultQueryWrapper);
+        StationDetail stationDetail = stationDetailMapper.selectOne(new QueryWrapper<StationDetail>().eq("stationID", stationID));
+
+        stationInformation.setLongitude(stationDetail.getLongitude());
+        stationInformation.setLatitude(stationDetail.getLatitude());
         stationInformation.setStationID(stationID);
         stationInformation.setName(stationName);
         stationInformation.setTime(time);
         stationInformation.setInNum(stationFlow.getInnum());
         stationInformation.setOutNum(stationFlow.getOutnum());
-        QueryWrapper<CongestionResult> congestionResultQueryWrapper = new QueryWrapper<>();
-        congestionResultQueryWrapper.eq("stationID", stationID).eq("time", time);
-        CongestionResult congestionResult = congestionResultMapper.selectOne(congestionResultQueryWrapper);
         stationInformation.setCongestion(congestionResult.getCongestionnormalization());
 
         return Result.success(stationInformation);
