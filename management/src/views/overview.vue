@@ -17,7 +17,7 @@ export default {
   name: "overview",
   data(){
     return{
-      data1:[[],[],[],[],[]],
+      data1:[[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]],
       xzhou:[],
 
 
@@ -27,12 +27,24 @@ export default {
     this.drawChart();
     request.get('/api/StationFlow/getLineInNumByID/'+'1').then(res =>{
       for(var i=0;i<res.data.length-1;i++){
-        this.xzhou.push(res.data[i].first);
+        this.xzhou.push(res.data[i].first.substring(11));
         this.data1[0].push(res.data[i].second);
       }
     })
     this.qingqiu(2);
     this.qingqiu(3);
+    this.qingqiu(4);
+    this.qingqiu(5);
+    this.qingqiu(6);
+    this.qingqiu(7);
+    this.qingqiu(8);
+    this.qingqiu(9);
+    this.qingqiu(10);
+    this.qingqiu(11);
+    this.qingqiu(12);
+    this.qingqiu(13);
+    this.qingqiu(16);
+
     this.openFullScreen2();
   },
   watch: {
@@ -82,7 +94,9 @@ export default {
           orient: 'horizontal', //图例布局方式：水平 'horizontal' 、垂直 'vertical'
           x: 'left', // 横向放置位置，选项：'center'、'left'、'right'、'number'（横向值 px）
           y: 'top',// 纵向放置位置，选项：'top'、'bottom'、'center'、'number'（纵向值 px）
-          data: ['一号线', '二号线', '三号线'],
+          data: ['一号线', '二号线', '三号线','四号线', '五号线', '六号线','七号线', '八号线', '九号线','十号线', '十一号线', '十二号线','十三号线', '十六号线',],
+          selected:{'一号线':true, '二号线':true, '三号线':true,'四号线':false, '五号线':false, '六号线':false,
+            '七号线':false, '八号线':false, '九号线':false,'十号线':false, '十一号线':false, '十二号线':false,'十三号线':false, '十六号线':false,},
           textStyle: {
             color: '#ffffff'                              // 图例文字颜色
           }
@@ -195,8 +209,217 @@ export default {
               }
             }
           }
+          ,
+
+          {
+            name: '四号线',
+            data: this.data1[3],
+            type: 'line',
+            symbolSize: 8,
+            itemStyle: {
+              normal: {
+                label: {
+                  show: true // 在折线拐点上显示数据
+                },
+                lineStyle: {
+                  width: 3,  // 设置虚线宽度
+                  type: 'dotted'  // 虚线'dotted' 实线'solid'
+                }
+              }
+            }
+          }
+          ,
+
+          {
+            name: '五号线',
+            data: this.data1[4],
+            type: 'line',
+            symbolSize: 8,
+            itemStyle: {
+              normal: {
+                label: {
+                  show: true // 在折线拐点上显示数据
+                },
+                lineStyle: {
+                  width: 3,  // 设置虚线宽度
+                  type: 'dotted'  // 虚线'dotted' 实线'solid'
+                }
+              }
+            }
+          }
+          ,
+
+          {
+            name: '六号线',
+            data: this.data1[5],
+            type: 'line',
+            symbolSize: 8,
+            itemStyle: {
+              normal: {
+                label: {
+                  show: true // 在折线拐点上显示数据
+                },
+                lineStyle: {
+                  width: 3,  // 设置虚线宽度
+                  type: 'dotted'  // 虚线'dotted' 实线'solid'
+                }
+              }
+            }
+          }
+          ,
+
+          {
+            name: '七号线',
+            data: this.data1[6],
+            type: 'line',
+            symbolSize: 8,
+            itemStyle: {
+              normal: {
+                label: {
+                  show: true // 在折线拐点上显示数据
+                },
+                lineStyle: {
+                  width: 3,  // 设置虚线宽度
+                  type: 'dotted'  // 虚线'dotted' 实线'solid'
+                }
+              }
+            }
+          }
+          ,
+
+          {
+            name: '八号线',
+            data: this.data1[7],
+            type: 'line',
+            symbolSize: 8,
+            itemStyle: {
+              normal: {
+                label: {
+                  show: true // 在折线拐点上显示数据
+                },
+                lineStyle: {
+                  width: 3,  // 设置虚线宽度
+                  type: 'dotted'  // 虚线'dotted' 实线'solid'
+                }
+              }
+            }
+          }
+          ,
+
+          {
+            name: '九号线',
+            data: this.data1[8],
+            type: 'line',
+            symbolSize: 8,
+            itemStyle: {
+              normal: {
+                label: {
+                  show: true // 在折线拐点上显示数据
+                },
+                lineStyle: {
+                  width: 3,  // 设置虚线宽度
+                  type: 'dotted'  // 虚线'dotted' 实线'solid'
+                }
+              }
+            }
+          }
+          ,
+
+          {
+            name: '十号线',
+            data: this.data1[9],
+            type: 'line',
+            symbolSize: 8,
+            itemStyle: {
+              normal: {
+                label: {
+                  show: true // 在折线拐点上显示数据
+                },
+                lineStyle: {
+                  width: 3,  // 设置虚线宽度
+                  type: 'dotted'  // 虚线'dotted' 实线'solid'
+                }
+              }
+            }
+          }
+          ,
+
+          {
+            name: '十一号线',
+            data: this.data1[10],
+            type: 'line',
+            symbolSize: 8,
+            itemStyle: {
+              normal: {
+                label: {
+                  show: true // 在折线拐点上显示数据
+                },
+                lineStyle: {
+                  width: 3,  // 设置虚线宽度
+                  type: 'dotted'  // 虚线'dotted' 实线'solid'
+                }
+              }
+            }
+          }
+          ,
+
+          {
+            name: '十二号线',
+            data: this.data1[11],
+            type: 'line',
+            symbolSize: 8,
+            itemStyle: {
+              normal: {
+                label: {
+                  show: true // 在折线拐点上显示数据
+                },
+                lineStyle: {
+                  width: 3,  // 设置虚线宽度
+                  type: 'dotted'  // 虚线'dotted' 实线'solid'
+                }
+              }
+            }
+          }
+          ,
+
+          {
+            name: '十三号线',
+            data: this.data1[12],
+            type: 'line',
+            symbolSize: 8,
+            itemStyle: {
+              normal: {
+                label: {
+                  show: true // 在折线拐点上显示数据
+                },
+                lineStyle: {
+                  width: 3,  // 设置虚线宽度
+                  type: 'dotted'  // 虚线'dotted' 实线'solid'
+                }
+              }
+            }
+          }
+          ,
+
+          {
+            name: '十六号线',
+            data: this.data1[13],
+            type: 'line',
+            symbolSize: 8,
+            itemStyle: {
+              normal: {
+                label: {
+                  show: true // 在折线拐点上显示数据
+                },
+                lineStyle: {
+                  width: 3,  // 设置虚线宽度
+                  type: 'dotted'  // 虚线'dotted' 实线'solid'
+                }
+              }
+            }
+          }
         ],
-        color: ['pink', 'red', 'yellow'] // 三个折线的颜色
+        color: ['pink', 'red', 'yellow','pink', 'red', 'yellow','pink', 'red', 'yellow','pink', 'red', 'yellow','pink', 'red',] // 三个折线的颜色
       }
       // 使用刚指定的配置项和数据显示图表。
       myChart.setOption(option);
