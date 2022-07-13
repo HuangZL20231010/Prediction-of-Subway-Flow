@@ -11,6 +11,7 @@ public class StationInformation
     private Integer outNum;  // 出站量
     private String longitude;   // 经度
     private String latitude;    // 纬度
+    private Double congestion;  // 拥堵指数
 
     public void setOutNum(Integer outNum) {
         this.outNum = outNum;
@@ -76,5 +77,11 @@ public class StationInformation
         this.lineID = lineID;
     }
 
+    public Double getCongestion() {
+        return congestion;
+    }
 
+    public void setCongestion(Double congestion) {
+        this.congestion = congestion;
+    }
 }

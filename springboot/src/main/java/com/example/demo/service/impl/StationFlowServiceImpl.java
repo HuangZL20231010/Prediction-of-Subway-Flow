@@ -1,10 +1,12 @@
 package com.example.demo.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.example.demo.mapper.CongestionResultMapper;
 import com.example.demo.mapper.LineFlowMapper;
 import com.example.demo.mapper.StationDetailMapper;
 import com.example.demo.mapper.StationFlowMapper;
 import com.example.demo.pojo.entity.StationInformation;
+import com.example.demo.pojo.table.CongestionResult;
 import com.example.demo.pojo.table.LineFlow;
 import com.example.demo.pojo.table.StationDetail;
 import com.example.demo.pojo.table.StationFlow;
@@ -28,6 +30,9 @@ public class StationFlowServiceImpl implements StationFlowService
     private LineFlowMapper lineFlowMapper;
     @Autowired
     private StationDetailService stationDetailService;
+
+    @Autowired
+    private CongestionResultMapper congestionResultMapper;
 
 
     @Override
@@ -97,7 +102,8 @@ public class StationFlowServiceImpl implements StationFlowService
     // 传入特定线路的名称和时间，获取该线路在该时间点的所有站点的：id，名称，入站量，出站量，经纬度，其它变量不存
     // 返回链表，元素是站点信息的实体类，注意传入的时间time需要转换
     @Override
-    public List<StationInformation> getStationInfoInLineByTime(Integer lineName, String time) {
+    public List<StationInformation> getStationInfoInLineByTime(Integer lineName, String time)
+    {
         TimeUtil timeUtil = new TimeUtil();
         timeUtil.setTime(time);
         timeUtil.toApproachTime();
@@ -107,13 +113,19 @@ public class StationFlowServiceImpl implements StationFlowService
         List<StationInformation>  StationInformations=new ArrayList<>();
         sectionQueryWrapper2.eq("lineName", lineName);
         StationDetails=stationDetailMapper.selectList(sectionQueryWrapper2);
-        for (StationDetail item : StationDetails) {
+        for (StationDetail item : StationDetails)
+        {
             QueryWrapper<StationFlow> sectionQueryWrapper = new QueryWrapper<>();
             StationInformation stationInformation=new StationInformation();
             Integer Stationid =0;
             Stationid=item.getStationid();
             sectionQueryWrapper.eq("time", time).eq("stationID",Stationid);
             StationFlow stationFlow= stationFlowMapper.selectOne(sectionQueryWrapper);
+            QueryWrapper<CongestionResult> congestionResultQueryWrapper = new QueryWrapper<>();
+            congestionResultQueryWrapper.eq("stationID", item.getStationid()).eq("time", time);
+            CongestionResult congestionResult = congestionResultMapper.selectOne(congestionResultQueryWrapper);
+
+
             stationInformation.setStationID(Stationid);
             stationInformation.setName(item.getStationname());
             stationInformation.setLongitude(item.getLongitude());
@@ -121,8 +133,10 @@ public class StationFlowServiceImpl implements StationFlowService
             stationInformation.setInNum(stationFlow.getInnum());
             stationInformation.setOutNum(stationFlow.getOutnum());
             stationInformation.setTime(time);
+            stationInformation.setCongestion(congestionResult.getCongestionnormalization());
             StationInformations.add(stationInformation);
         }
+
         return StationInformations;
     }
 
