@@ -8,10 +8,18 @@ import lombok.Data;
 public class StationJudge
 {
     Integer stationid;
-    String carcapcity;
-    String morningtime;
-    String eveningtime;
-    String othertime;
+    Integer carcapacity;
+    Integer morningtime;
+    Integer eveningtime;
+    Integer othertime;
+
+    public Integer getCarcapacity() {
+        return carcapacity;
+    }
+
+    public void setCarcapacity(Integer carcapacity) {
+        this.carcapacity = carcapacity;
+    }
 
     public void setStationid(Integer stationid) {
         this.stationid = stationid;
@@ -21,36 +29,28 @@ public class StationJudge
         return stationid;
     }
 
-    public String getCarcapcity() {
-        return carcapcity;
-    }
-
-    public String getEveningtime() {
-        return eveningtime;
-    }
-
-    public String getMorningtime() {
-        return morningtime;
-    }
-
-    public String getOthertime() {
-        return othertime;
-    }
-
-    public void setCarcapcity(String carcapcity) {
-        this.carcapcity = carcapcity;
-    }
-
-    public void setEveningtime(String eveningtime) {
-        this.eveningtime = eveningtime;
-    }
-
-    public void setMorningtime(String morningtime) {
-        this.morningtime = morningtime;
-    }
-
-    public void setOthertime(String othertime) {
+    public void setOthertime(Integer othertime) {
         this.othertime = othertime;
     }
 
+    public void setMorningtime(Integer morningtime) {
+        this.morningtime = morningtime;
+    }
+
+    public void setEveningtime(Integer eveningtime) {
+        this.eveningtime = eveningtime;
+    }
+
+    public Integer getEveningtime() {
+        return eveningtime;
+    }
+
+    public Integer getMorningtime() {
+        return morningtime;
+    }
+
+    public Integer getOthertime() {
+        return othertime;
+    }
 }
+
