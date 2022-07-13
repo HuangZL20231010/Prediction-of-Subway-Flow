@@ -14,7 +14,7 @@ public class URLConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         //文件磁盘图片url 映射
         //配置server虚拟路径，handler为前台访问的目录，locations为files相对应的本地路径
-        registry.addResourceHandler("/pic/view/**").addResourceLocations("file:/E:/pic/");
+        registry.addResourceHandler("/resource/**").addResourceLocations("file:/C:/Users/Jarvis2K/Desktop/小学期2/Workspace/management/src/resource/");
         registry.addResourceHandler("/video/view/**").addResourceLocations("file:/E:/video/");
         WebMvcConfigurer.super.addResourceHandlers(registry);
     }

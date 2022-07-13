@@ -45,42 +45,43 @@
             <div id="main" style="width: 430px; height: 300px"></div>
           </div>
           <div>
-            <span style="color: white;font-weight: bolder;font-size: 20px">预测流量排行</span>
-            <el-table
-                v-loading="loading"
-                element-loading-text="拼命加载中"
-                element-loading-spinner="el-icon-loading"
-                element-loading-background="rgba(0, 0, 0, 0.8)"
-                :header-cell-style="{background:'#206cbb',color:'#ffffff',fontWeight:'bolder',fontSize: '16px'}"
-                :cell-style="{color:'#ffffff',fontSize: '16px'}"
-                :data="tableData"
-                style="width: 400px;"
-                height="250px"
-                :row-class-name="tableRowClassName">
-              <el-table-column
-                  style="background-color: rgba(31,97,167,0.6);font-weight: bolder"
+            <span style="color: white;font-weight: bolder;font-size: 20px;margin-bottom: 20px;margin-top: 0px">预测流量排行 预测时间点：{{returntime}}</span>
+<!--            <el-table-->
+<!--                v-loading="loading"-->
+<!--                element-loading-text="拼命加载中"-->
+<!--                element-loading-spinner="el-icon-loading"-->
+<!--                element-loading-background="rgba(0, 0, 0, 0.8)"-->
+<!--                :header-cell-style="{background:'#206cbb',color:'#ffffff',fontWeight:'bolder',fontSize: '16px'}"-->
+<!--                :cell-style="{color:'#ffffff',fontSize: '16px'}"-->
+<!--                :data="tableData"-->
+<!--                style="width: 400px;"-->
+<!--                height="250px"-->
+<!--                :row-class-name="tableRowClassName">-->
+<!--              <el-table-column-->
+<!--                  style="background-color: rgba(31,97,167,0.6);font-weight: bolder"-->
 
-                  prop="stationID"
-                  label="排名"
-                  width="70">
-              </el-table-column>
-              <el-table-column
-                  style="background-color: rgba(31,97,167,0.6)"
-                  prop="name"
-                  label="站点名称"
-                  width="200">
-                <template slot-scope="scope">
-                  <!-- 注意：这个地方要传参数进去才能进行操作  函数名称(scope.row) -->
-                  <div @click="zoomsite(scope.row)">{{ scope.row.name }}</div>
-                </template>
-              </el-table-column>
-              <el-table-column
-                  prop="inNum"
-                  label="预测人流量"
-                  width="130">
-              </el-table-column>
-            </el-table></div>
-
+<!--                  prop="stationID"-->
+<!--                  label="排名"-->
+<!--                  width="70">-->
+<!--              </el-table-column>-->
+<!--              <el-table-column-->
+<!--                  style="background-color: rgba(31,97,167,0.6)"-->
+<!--                  prop="name"-->
+<!--                  label="站点名称"-->
+<!--                  width="200">-->
+<!--                <template slot-scope="scope">-->
+<!--                  &lt;!&ndash; 注意：这个地方要传参数进去才能进行操作  函数名称(scope.row) &ndash;&gt;-->
+<!--                  <div @click="zoomsite(scope.row)">{{ scope.row.name }}</div>-->
+<!--                </template>-->
+<!--              </el-table-column>-->
+<!--              <el-table-column-->
+<!--                  prop="inNum"-->
+<!--                  label="预测人流量"-->
+<!--                  width="130">-->
+<!--              </el-table-column>-->
+<!--            </el-table>-->
+            <div id="bar" style="width: 400px;height:250px;margin-top: 0px"></div>
+          </div>
         </el-card>
     </transition>
 
@@ -89,11 +90,12 @@
       <p style="font-size: 20px;font-weight: bolder;color:white;
       text-decoration: underline;letter-spacing:4px">
         上海轨道交通客流量预测</p>
-      <p style="color:white">{{nowDate}}</p>
+      <p style="color:white">当点时间：{{nowDate}}</p>
 <!--      <el-button type="primary" size="small" autocomplete="off" @click="testclick()">弹窗测试</el-button>-->
     </div>
 
     <div id="container" ></div>
+    <div id="result" tabindex="0"></div>
   </div>
 
 
@@ -108,17 +110,19 @@ import AMapLoader from '@amap/amap-jsapi-loader';
 export default {
   data() {
     return {
+      xValue:[],
+      yValue:[],
       chartdatain:[],
       chartdataout:[],
       chartsitename:'未选择',
       selectime:'',
       nowDate: null,
       nowtimer: "",
-      radio1:'1号线',
+      radio1:'',
       sites:['同济大学','上海南站','东方明珠'],
       clicktime:0,
       nowTime:'22:00',
-      xzhou:[],
+      xzhou:[0,1,2],
       data1:[],
       busPolyline:null,
       showw:true,
@@ -129,6 +133,15 @@ export default {
       mysubway: null,
     }
   },
+  watch: {
+    //监听的变量名
+    xValue:{
+      handler(newName, oldName) {
+        this.showrank();
+      },
+      immediate: true
+    }
+  },
   created() {
     this.nowtimer = setInterval(this.gettime, 1000);
   },
@@ -136,12 +149,139 @@ export default {
     this.initMap();
     this.drawChart();
     request.get('/api/StationFlow/getStationInNumRank').then(res =>{
-      this.tableData = res.data;
-      this.nowTime=this.tableData[0].time;
+      // this.tableData = res.data;
+      // this.nowTime=this.tableData[0].time;
+      for(var i=0;i<res.data.length;i++){
+        this.xValue[i]=(res.data[i].inNum+res.data[i].outNum);
+        this.yValue[i]=(res.data[i].name);
+        this.returntime=res.data[i].time.substring(11);
+      }
+      this.xValue.reverse();
+      this.yValue.reverse();
     })
-
+    this.showrank();
 },
   methods: {
+
+    showrank() {
+      let rank = this.$echarts.init(document.getElementById("bar"));
+      var option = {
+        color: ['#d84430'],
+        tooltip: {
+          show: true
+        },
+
+        yAxis: {
+          axisTick: {
+            show: false
+          },
+          axisLine: {
+            show: false,
+          },
+          axisLabel: {
+            inside: true,
+            verticalAlign: 'bottom',
+            lineHeight: 40,
+            color: '#DDDFEB',
+            formatter: function (value, index) {   // 设置y轴文字的颜色
+              if (index >2) {
+                return '{first|' + value + '}'
+              } else {
+                return '{other|' + value + '}'
+              }
+            },
+            rich: {
+              other: {
+                color: '#DDDFEB',
+
+                opacity: 1
+              },
+              first: {
+                fontSize:'16',
+                color: '#FFFFFF'
+              }
+            }
+          },
+          data: this.yValue
+        },
+        xAxis: {
+          nameTextStyle: {
+            color: 'rgba(255, 255, 255, 0.8)',
+            align: 'right'
+          },
+          splitLine: {
+            show: false,
+          },
+          axisLine: {
+            show: false,
+          },
+          axisLabel: {
+            color: 'rgba(255, 255, 255, 0.8)'
+          },
+        },
+        grid: {
+          top: '10%',
+          bottom: '0%',
+          left: '0%',
+          right: '0%'
+        },
+        dataZoom: [
+          {
+            type: "slider",
+            show: true,//隐藏或显示（true）组件
+            backgroundColor: "rgb(19, 63, 100)", // 组件的背景颜色。
+            fillerColor: "rgb(16, 171, 198)", // 选中范围的填充颜色。
+            borderColor: "rgb(19, 63, 100)", // 边框颜色
+            showDetail: false, //是否显示detail，即拖拽时候显示详细数值信息
+            startValue: 14, // 数据窗口范围的起始数值
+            endValue: 10, // 数据窗口范围的结束数值（一页显示多少条数据）
+            yAxisIndex: [0, 1],//控制哪个轴，如果是 number 表示控制一个轴，如果是 Array 表示控制多个轴。此处控制第二根轴
+            filterMode: "empty",
+            width: 8, //滚动条高度
+            height: "100%", //滚动条显示位置
+            right: 0, // 距离右边
+            handleSize: 0,//控制手柄的尺寸
+            zoomLoxk: true, // 是否锁定选择区域（或叫做数据窗口）的大小
+            top: "middle",
+          },
+          {
+            //没有下面这块的话，只能拖动滚动条，鼠标滚轮在区域内不能控制外部滚动条
+            type: "inside",
+            yAxisIndex: [0, 1],//控制哪个轴，如果是 number 表示控制一个轴，如果是 Array 表示控制多个轴。此处控制第二根轴
+            zoomOnMouseWheel: false, //滚轮是否触发缩放
+            moveOnMouseMove: true, //鼠标移动能否触发平移
+            moveOnMouseWheel: true,//鼠标滚轮能否触发平移
+          },
+        ],
+        series: [{
+          name: '客流量预测',
+          barWidth: 15,
+          type: 'bar',
+          data: this.xValue,
+          itemStyle: {
+            normal: {
+              borderRadius: [3, 20, 20, 3],
+              color: function (params) {   // 设置柱形图的颜色
+                if (params.dataIndex === 14) {
+                  return '#d84430'
+                } else if (params.dataIndex === 13) {
+                  return '#f38237'
+                } else if (params.dataIndex === 12) {
+                  return '#e2aa20'
+                } else {
+                  return '#608289'
+                }
+              }
+            },
+          }
+        }]
+      };
+      // 使用刚指定的配置项和数据显示图表。
+      rank.setOption(option);
+      window.addEventListener('resize', () => {
+        rank.resize()
+      })
+    },
     choosetime(){
       console.log(this.selectime)
       if(this.radio1.length==3){var line =parseInt(this.radio1.charAt(0))}
@@ -154,7 +294,17 @@ export default {
         for(var i =0;i<this.sitesinfo.length;i++){
           this.drawsite(this.sitesinfo[i].longitude,this.sitesinfo[i].latitude,i)
         }
+      });
+      request.get('/api/StationFlow/getStationInNumRank/'+this.selectime).then(res =>{
+        for(var i=0;i<res.data.length;i++){
+          this.xValue[i]=(res.data[i].inNum+res.data[i].outNum);
+          this.yValue[i]=(res.data[i].name);
+          this.returntime=res.data[i].time.substring(11);
+        }
+        this.xValue.reverse();
+        this.yValue.reverse();
       })
+
     },
     gettime() {
       this.nowDate = new Date().toLocaleString();
@@ -193,6 +343,15 @@ export default {
     },
     lineChange(){
       this.selectime=null;
+      request.get('/api/StationFlow/getStationInNumRank/').then(res =>{
+        for(var i=0;i<res.data.length;i++){
+          this.xValue[i]=(res.data[i].inNum+res.data[i].outNum);
+          this.yValue[i]=(res.data[i].name);
+          this.returntime=res.data[i].time.substring(11);
+        }
+        this.xValue.reverse();
+        this.yValue.reverse();
+      })
       this.map.remove(this.busPolyline);
       this.map.remove(this.markerList);
       var linename= '地铁'+this.radio1;
@@ -272,10 +431,11 @@ export default {
     },
 
     testclick(){
-      request.post('/api/StationFlow/getLineInNumByID',1).then(res =>{
-        // this.sitesinfo = res.data;
-        console.log(res);
-      })
+      this.getRemote();
+      // request.post('/api/StationFlow/getLineInNumByID',1).then(res =>{
+      //   this.sitesinfo = res.data;
+      //   console.log(res);
+      // })
       // var line = '2';
       // request.post('/api/StationFlow/StationByLine').then(res =>{
       //   this.sitesinfo = res.data;
@@ -290,6 +450,7 @@ export default {
       }
       if(this.clicktime==1){
         this.drawChart();
+        this.showrank();
         this.clicktime=0;
       }
     },
@@ -319,7 +480,7 @@ export default {
         key:"905b4f99bdf009b2c1607f940ec805e5", // 申请好的Web端开发者Key，首次调用 load 时必填
 
         version:"2.0",      // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
-        plugins:['AMap.LineSearch','AMap.PlaceSearch','AMap.ToolBar', 'AMap.Scale'],       // 需要使用的的插件列表，如比例尺'AMap.Scale'等
+        plugins:['AMap.LineSearch','AMap.PlaceSearch','AMap.ToolBar', 'AMap.Scale','AMap.Transfer'],       // 需要使用的的插件列表，如比例尺'AMap.Scale'等
       }).then((AMap)=>{
         this.map = new AMap.Map("container",{  //设置地图容器id
           resizeEnable: true,
@@ -334,6 +495,22 @@ export default {
       }).catch(e=>{
         console.log(e);
       })
+    },
+    getRemote(){
+      this.map.remove(this.busPolyline);
+      var transOptions = {
+        map: this.map,
+        panel: "result",
+        city: '上海市',                            //公交城市
+        policy: AMap.TransferPolicy.LEAST_TIME //乘车策略
+      };
+        var transfer = new AMap.Transfer(transOptions);
+        //根据起、终点坐标查询公交换乘路线
+        //trans.search([116.379028, 39.865042], [116.427281, 39.903719]);
+
+      transfer.search([{keyword:'上海南站'},{keyword:'同济大学'}], function(status, result){
+          console.log(result);
+        })
     },
     lineSearch(line) {
       var linesearch = null;
@@ -410,6 +587,8 @@ export default {
       if(pointData.out>=100&&pointData.out<400){info.push("<div><p style='color:sandybrown'>预测出站人数");}
       if(pointData.out>=400){info.push("<div><p style='color:darkred'>预测出站人数");}
       info.push(": "+pointData.out+"</p></div>")
+      info.push("<div><p style='color:LightSalmon'>时间点");
+      info.push(": "+pointData.time.substring(11)+"</p></div>")
 
       let infoWindow = new AMap.InfoWindow({
         content: info.join(""),
@@ -418,9 +597,15 @@ export default {
       infoWindow.open(this.map, positionResult.lnglat);
       this.chartsitename=pointData.name;
       request.get('/api/StationFlow/getStationInOutNumByID/'+pointData.id).then(res =>{
-        console.log(res);
-        this.sitesinfo=res.data;
+          for(var i =0;i<res.data.length;i++){
+            this.chartdatain[i]=res.data[i].innum;
+            this.chartdataout[i]=res.data[i].outnum;
+            this.xzhou[i]=res.data[i].time.substring(11);
+          }
+          console.log(this.chartdatain)
+        this.drawChart();
       })
+
     },
 
     searchsite(site,i) {
@@ -443,28 +628,43 @@ export default {
     },
     drawsite(lng,lat,index){
       var index=index;
-      if(this.sitesinfo[index].inNum+this.sitesinfo[index].outNum<400){
-        var icon1=require("C:\\Users\\Jarvis2K\\Desktop\\小学期2\\Workspace\\management\\src\\resource\\green.gif");
-        var off =new AMap.Pixel(-25, -50);
-      }
-      if(this.sitesinfo[index].inNum+this.sitesinfo[index].outNum>=400&&this.sitesinfo[index].inNum+this.sitesinfo[index].outNum<700){
-        var icon1=require("C:\\Users\\Jarvis2K\\Desktop\\小学期2\\Workspace\\management\\src\\resource\\yellow.gif");
-        var off =new AMap.Pixel(-25, -50);
-      }
-      if(this.sitesinfo[index].inNum+this.sitesinfo[index].outNum>=700){
-        var icon1=require("C:\\Users\\Jarvis2K\\Desktop\\小学期2\\Workspace\\management\\src\\resource\\red.gif");
-        var off =new AMap.Pixel(-25, -25);
-      }
-      let icon = new AMap.Icon({
-        image: "C:\\Users\\Jarvis2K\\Desktop\\小学期2\\Workspace\\management\\src\\resource\\reddot200.gif",
-        size: new AMap.Size(52, 52),  //图标大小
-        imageSize: new AMap.Size(200,200)
+      var endicon=null;
+      var icon1=new AMap.Icon({
+        image: '/api/resource/green.gif',
+        size: new AMap.Size(50, 50),  //图标所处区域大小
+        imageSize: new AMap.Size(50,50) //图标大小
       });
+      var icon2=new AMap.Icon({
+        image: '/api/resource/warn.gif',
+        size: new AMap.Size(50, 50),  //图标所处区域大小
+        imageSize: new AMap.Size(50,50) //图标大小
+      });
+      var icon3=new AMap.Icon({
+        image: '/api/resource/red.gif',
+        size: new AMap.Size(50, 50),  //图标所处区域大小
+        imageSize: new AMap.Size(50,50) //图标大小
+      });
+
+      if(this.sitesinfo[index].inNum+this.sitesinfo[index].outNum<400){
+        endicon=icon1;
+        var off =new AMap.Pixel(-25, -50);
+      }
+      if(this.sitesinfo[index].inNum+this.sitesinfo[index].outNum>=400&&this.sitesinfo[index].inNum+this.sitesinfo[index].outNum<900){
+        endicon=icon2;
+        var off =new AMap.Pixel(-25, -50);
+      }
+      if(this.sitesinfo[index].inNum+this.sitesinfo[index].outNum>=900){
+        endicon=icon3;
+        var off =new AMap.Pixel(-25, -50);
+      }
+
+
       var marker = new window.AMap.Marker({
         position: [lng,lat],
         map:this.map,
         // icon: icon,
-        icon:icon1,
+        icon:endicon,
+        // icon:icon1,
         offset: off,
         extData : {"name":this.sitesinfo[index].name,"in":this.sitesinfo[index].inNum,"out":this.sitesinfo[index].outNum,
           'id':this.sitesinfo[index].stationID,'time':this.sitesinfo[index].time}
@@ -509,7 +709,7 @@ export default {
           orient: 'horizontal', //图例布局方式：水平 'horizontal' 、垂直 'vertical'
           x: 'left', // 横向放置位置，选项：'center'、'left'、'right'、'number'（横向值 px）
           y: 'top',// 纵向放置位置，选项：'top'、'bottom'、'center'、'number'（纵向值 px）
-          data: ['猜想', '预期', '实际'],
+          data: ['进站流量', '出站流量'],
           textStyle: {
             color: '#ffffff'                              // 图例文字颜色
           }
@@ -540,6 +740,8 @@ export default {
         xAxis: {
           name: '时间',
           type: 'category',
+          start: 30,                                //数据窗口范围的起始百分比,表示30%
+          end: 70,
           axisLine: {
             lineStyle: { // X 轴颜色配置
               color: '#ffffff'
@@ -547,7 +749,7 @@ export default {
           },
           axisLabel: {
             rotate: 45, // X 轴标签文字旋转角度
-            interval: 0  //设置 X 轴数据间隔几个显示一个，为0表示都显示
+            interval: 12,  //设置 X 轴数据间隔几个显示一个，为0表示都显示
           },
           boundaryGap: false, //数据从 Y 轴起始
           data: this.xzhou,
@@ -556,8 +758,9 @@ export default {
         yAxis: {
           name: '人次',
           type: 'value',
-          min: 0, // 配置 Y 轴刻度最小值
-          max: 4000,  // 配置 Y 轴刻度最大值
+          scale:true,
+          // min: 0, // 配置 Y 轴刻度最小值
+          // max: 4000,  // 配置 Y 轴刻度最大值
           splitNumber: 7,  // 配置 Y 轴数值间隔
           splitLine: { //网格线
             show: true
@@ -571,9 +774,9 @@ export default {
 
         series: [
           {
-            name: '猜想',
+            name: '进站流量',
             // data: this.data1,
-            data:[],
+            data:this.chartdatain,
             type: 'line',
             symbolSize: function (value) {  // 点的大小跟随数值增加而变大
               return value / 150;
@@ -582,42 +785,61 @@ export default {
             itemStyle: {
               normal: {
                 label: {
-                  show: true
+                  show: false
                 },
                 lineStyle: {
-                  color: 'rgba(0,0,0,0)'// 折线颜色设置为0，即只显示点，不显示折线
+                  width: 3,  // 设置虚线宽度
+                  type: 'solid'  // 虚线'dotted' 实线'solid'
                 }
               }
             }
           },
 
           {
-            name: '预期',
-            data: [2455, 2534, 2360, 2301, 2861, 2181, 1944, 2197, 1745, 1810, 2283, 2298],
+            name: '出站流量',
+            data: this.chartdataout,
             type: 'line',
             symbolSize: 8,  //设置折线上圆点大小
             itemStyle: {
               normal: {
                 label: {
-                  show: true // 在折线拐点上显示数据
+                  show: false // 在折线拐点上显示数据
                 },
                 lineStyle: {
                   width: 3,  // 设置虚线宽度
-                  type: 'dotted'  // 虚线'dotted' 实线'solid'
+                  type: 'solid'  // 虚线'dotted' 实线'solid'
                 }
               }
             }
           },
-
-          {
-            name: '实际',
-            data: [1107, 1352, 1740, 1968, 1647, 1570, 1343, 1757, 2547, 2762, 3170, 3665],
-            type: 'line',
-            symbol: 'circle', // 实心圆点
-            smooth: 0.5, // 设置折线弧度
-          }
         ],
-        color: ['#ffffff', '#FFCC99', '#ffffff'] // 三个折线的颜色
+        color: ['#FFD700', '#99CC66', ], // 三个折线的颜色
+        // dataZoom: [
+        //   {
+        //     type: "slider", //隐藏或显示（true）组件
+        //     show: true,
+        //     backgroundColor: "rgb(19, 63, 100)", // 组件的背景颜色。
+        //     fillerColor: "rgb(16, 171, 198)", // 选中范围的填充颜色。
+        //     borderColor: "rgb(19, 63, 100)", // 边框颜色
+        //     showDetail: false, //是否显示detail，即拖拽时候显示详细数值信息
+        //     startValue: 0,
+        //     endValue: 30,
+        //     filterMode: "empty",
+        //     width: "80%", //滚动条高度
+        //     height: 20, //滚动条显示位置
+        //     left: "center",
+        //     zoomLoxk: true, // 是否锁定选择区域（或叫做数据窗口）的大小
+        //     handleSize: 0, //控制手柄的尺寸
+        //     bottom: 3, // dataZoom-slider组件离容器下侧的距离
+        //   },
+        //   {
+        //     //没有下面这块的话，只能拖动滚动条，鼠标滚轮在区域内不能控制外部滚动条
+        //     type: "inside",
+        //     zoomOnMouseWheel: false, //滚轮是否触发缩放
+        //     moveOnMouseMove: true, //鼠标滚轮触发滚动
+        //     moveOnMouseWheel: true,
+        //   },
+        // ],
       }
       // 使用刚指定的配置项和数据显示图表。
       myChart.setOption(option);
@@ -748,4 +970,10 @@ export default {
 /deep/.el-table__body-wrapper::-webkit-scrollbar{
   width: 0;
 }
+#result{
+
+  height: 10%;
+  width: 100%;
+}
+
 </style>
