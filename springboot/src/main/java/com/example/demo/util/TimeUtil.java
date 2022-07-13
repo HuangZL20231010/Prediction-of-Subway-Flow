@@ -35,4 +35,12 @@ public class TimeUtil
 
         return true;
     }
+
+    // 传入时间点，判断该时间点是属于哪一段
+    // 传入参数类似于2015/04/29 17:30:00,不必做时间转换
+    // 如果时间位于7:30至9:30返回1，位于17:30至19:30返回2，其他时间点返回3
+    public Integer judgeTimePeriod(String time)
+    {
+        return 0;
+    }
 }

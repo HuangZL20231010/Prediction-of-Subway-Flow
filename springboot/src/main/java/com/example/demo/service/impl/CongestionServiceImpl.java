@@ -7,4 +7,8 @@ import org.springframework.stereotype.Service;
 public class CongestionServiceImpl implements CongestionService
 {
 
+    @Override
+    public Integer calculateCongestionFactor(Integer stationID, String time) {
+        return null;
+    }
 }
