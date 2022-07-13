@@ -1,8 +1,15 @@
 package com.example.demo.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.demo.common.Result;
+import com.example.demo.mapper.CongestionResultMapper;
+import com.example.demo.mapper.StationDetailMapper;
+import com.example.demo.mapper.StationFlowMapper;
 import com.example.demo.pojo.entity.LineInformationAllTime;
 import com.example.demo.pojo.entity.StationInformation;
+import com.example.demo.pojo.table.CongestionResult;
+import com.example.demo.pojo.table.StationDetail;
+import com.example.demo.pojo.table.StationFlow;
 import com.example.demo.service.StationDetailService;
 import com.example.demo.service.StationFlowService;
 import com.example.demo.util.TimeUtil;
@@ -25,6 +32,15 @@ public class StationFlowController
 
     @Autowired
     private StationDetailService stationDetailService;
+
+    @Autowired
+    private StationDetailMapper stationDetailMapper;
+
+    @Autowired
+    private StationFlowMapper stationFlowMapper;
+
+    @Autowired
+    private CongestionResultMapper congestionResultMapper;
 
     // 传入线路名称，返回当前时间该线路上所有站点的经纬度和入站量，出站量等信息
     // 有time参数版,传进来的time格式为05:10，肯定为整数
@@ -143,5 +159,46 @@ public class StationFlowController
         time="2015/04/29 "+ HMS;
 
         return Result.success(stationFlowService.getStationInOutNumAllTime(stationID, time));
+    }
+
+    // 传入站点名，对站点名进行处理后返回该站点在该时刻的相关信息
+    @GetMapping("/getStationInfoByName/{stationName}")
+    @ResponseBody
+    public Result<?> getStationInfoByName(@PathVariable("stationName") String stationName)
+    {
+        StationInformation stationInformation  = new StationInformation();
+
+        /* 获得当前时间 */
+        Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        String time = dateFormat.format(date); // 当前时间
+        TimeUtil timeUtil = new TimeUtil();
+        timeUtil.setTime(time);
+        timeUtil.toApproachTime();
+        time = timeUtil.getTime();
+
+        /* 处理站点名 */
+        int length = stationName.length();
+        stationName = stationName.substring(0, length - 5);
+
+        /* 根据站点名检索站点id */
+        QueryWrapper<StationDetail> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("stationName", stationName);
+        List<StationDetail> stationDetails = stationDetailMapper.selectList(queryWrapper);
+        Integer stationID = stationDetails.get(0).getStationid();
+
+        /* 根据站点id检索站点相关信息 */
+        StationFlow stationFlow = stationFlowMapper.selectOne(new QueryWrapper<StationFlow>().eq("stationID", stationID).eq("time", time));
+        stationInformation.setStationID(stationID);
+        stationInformation.setName(stationName);
+        stationInformation.setTime(time);
+        stationInformation.setInNum(stationFlow.getInnum());
+        stationInformation.setOutNum(stationFlow.getOutnum());
+        QueryWrapper<CongestionResult> congestionResultQueryWrapper = new QueryWrapper<>();
+        congestionResultQueryWrapper.eq("stationID", stationID).eq("time", time);
+        CongestionResult congestionResult = congestionResultMapper.selectOne(congestionResultQueryWrapper);
+        stationInformation.setCongestion(congestionResult.getCongestionnormalization());
+
+        return Result.success(stationInformation);
     }
 }

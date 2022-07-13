@@ -11,6 +11,7 @@ public class CongestionResult
     Integer stationid;
     String time;
     Double congestionlevel;
+    Double congestionnormalization;
 
     public Integer getStationid() {
         return stationid;
@@ -35,5 +36,14 @@ public class CongestionResult
     public void setCongestionlevel(Double congestionlevel) {
         this.congestionlevel = congestionlevel;
     }
+
+    public Double getCongestionnormalization() {
+        return congestionnormalization;
+    }
+
+    public void setCongestionnormalization(Double congestionnormalization) {
+        this.congestionnormalization = congestionnormalization;
+    }
+
 
 }
