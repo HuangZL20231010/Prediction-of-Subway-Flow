@@ -145,8 +145,9 @@ export default {
         yAxis: {
           name: '人次',
           type: 'value',
-          min: 0, // 配置 Y 轴刻度最小值
-          max: 35000,  // 配置 Y 轴刻度最大值
+          // min: 0, // 配置 Y 轴刻度最小值
+          // max: 35000,  // 配置 Y 轴刻度最大值
+          scale:true,
           splitNumber: 7,  // 配置 Y 轴数值间隔
           axisLine: {
             lineStyle: {   // Y 轴颜色配置
@@ -168,7 +169,7 @@ export default {
                 },
                 lineStyle: {
                   width: 3,  // 设置虚线宽度
-                  type: 'dotted'  // 虚线'dotted' 实线'solid'
+                  type: 'solid'  // 虚线'solid' 实线'solid'
                 }
               }
             }
@@ -186,7 +187,7 @@ export default {
                 },
                 lineStyle: {
                   width: 3,  // 设置虚线宽度
-                  type: 'dotted'  // 虚线'dotted' 实线'solid'
+                  type: 'solid'  // 虚线'solid' 实线'solid'
                 }
               }
             }
@@ -204,7 +205,7 @@ export default {
                 },
                 lineStyle: {
                   width: 3,  // 设置虚线宽度
-                  type: 'dotted'  // 虚线'dotted' 实线'solid'
+                  type: 'solid'  // 虚线'solid' 实线'solid'
                 }
               }
             }
@@ -223,7 +224,7 @@ export default {
                 },
                 lineStyle: {
                   width: 3,  // 设置虚线宽度
-                  type: 'dotted'  // 虚线'dotted' 实线'solid'
+                  type: 'solid'  // 虚线'solid' 实线'solid'
                 }
               }
             }
@@ -242,7 +243,7 @@ export default {
                 },
                 lineStyle: {
                   width: 3,  // 设置虚线宽度
-                  type: 'dotted'  // 虚线'dotted' 实线'solid'
+                  type: 'solid'  // 虚线'solid' 实线'solid'
                 }
               }
             }
@@ -261,7 +262,7 @@ export default {
                 },
                 lineStyle: {
                   width: 3,  // 设置虚线宽度
-                  type: 'dotted'  // 虚线'dotted' 实线'solid'
+                  type: 'solid'  // 虚线'solid' 实线'solid'
                 }
               }
             }
@@ -280,7 +281,7 @@ export default {
                 },
                 lineStyle: {
                   width: 3,  // 设置虚线宽度
-                  type: 'dotted'  // 虚线'dotted' 实线'solid'
+                  type: 'solid'  // 虚线'solid' 实线'solid'
                 }
               }
             }
@@ -299,7 +300,7 @@ export default {
                 },
                 lineStyle: {
                   width: 3,  // 设置虚线宽度
-                  type: 'dotted'  // 虚线'dotted' 实线'solid'
+                  type: 'solid'  // 虚线'solid' 实线'solid'
                 }
               }
             }
@@ -318,7 +319,7 @@ export default {
                 },
                 lineStyle: {
                   width: 3,  // 设置虚线宽度
-                  type: 'dotted'  // 虚线'dotted' 实线'solid'
+                  type: 'solid'  // 虚线'solid' 实线'solid'
                 }
               }
             }
@@ -337,7 +338,7 @@ export default {
                 },
                 lineStyle: {
                   width: 3,  // 设置虚线宽度
-                  type: 'dotted'  // 虚线'dotted' 实线'solid'
+                  type: 'solid'  // 虚线'solid' 实线'solid'
                 }
               }
             }
@@ -356,7 +357,7 @@ export default {
                 },
                 lineStyle: {
                   width: 3,  // 设置虚线宽度
-                  type: 'dotted'  // 虚线'dotted' 实线'solid'
+                  type: 'solid'  // 虚线'solid' 实线'solid'
                 }
               }
             }
@@ -375,7 +376,7 @@ export default {
                 },
                 lineStyle: {
                   width: 3,  // 设置虚线宽度
-                  type: 'dotted'  // 虚线'dotted' 实线'solid'
+                  type: 'solid'  // 虚线'solid' 实线'solid'
                 }
               }
             }
@@ -394,7 +395,7 @@ export default {
                 },
                 lineStyle: {
                   width: 3,  // 设置虚线宽度
-                  type: 'dotted'  // 虚线'dotted' 实线'solid'
+                  type: 'solid'  // 虚线'solid' 实线'solid'
                 }
               }
             }
@@ -413,13 +414,14 @@ export default {
                 },
                 lineStyle: {
                   width: 3,  // 设置虚线宽度
-                  type: 'dotted'  // 虚线'dotted' 实线'solid'
+                  type: 'solid'  // 虚线'solid' 实线'solid'
                 }
               }
             }
           }
         ],
-        color: ['pink', 'red', 'yellow','pink', 'red', 'yellow','pink', 'red', 'yellow','pink', 'red', 'yellow','pink', 'red',] // 三个折线的颜色
+
+        color: ['pink', 'red', 'yellow','purple', 'black', 'white','darkgray', 'gold', 'lightgreen','lightpink', 'royalblue', 'greenyellow','bisque', 'brown',] // 三个折线的颜色
       }
       // 使用刚指定的配置项和数据显示图表。
       myChart.setOption(option);

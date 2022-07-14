@@ -24,7 +24,11 @@
 <!--    </div>-->
     <el-input class="scope" style="width: 300px" v-model="slocal" placeholder="请输入内容"></el-input>
     <el-input class="scope2" style="width: 300px" v-model="elocal" placeholder="请输入内容"></el-input>
-    <el-button style="background-color: indianred;color:white" class="scope3" @click="showremote">搜索路线！</el-button>
+    <el-button v-if="buttontime==0" style="background-color: indianred;color:white" class="scope3" @click="showremote">搜索路线！</el-button>
+    <el-button v-if="buttontime==1" style="background-color: lightgreen;color:black" class="scope3" @click="showremote">显示附近站点！</el-button>
+<!--    <el-button v-if="buttontime==1" style="background-color: royalblue;color:white" class="scope4" @click="back">复位</el-button>-->
+
+
 <!--    <div>-->
 <!--      <el-time-select-->
 <!--          class="scope3"-->
@@ -45,52 +49,15 @@
 
       <el-card v-if='showw' class="box-card" style="background-color: rgba(31,97,167,0.6);">
         <div slot="header" class="clearfix">
-          <span style="color: white;font-weight: bolder;font-size: 20px;margin-bottom: 20px">今日客流量预测 站点名： {{chartsitename}}</span>
+          <span style="color: white;font-weight: bolder;font-size: 20px;margin-bottom: 20px">当前选择站点： {{chartsitename}}</span>
           <div id="main" style="width: 430px; height: 300px"></div>
-        </div>
-        <div>
-          <span style="color: white;font-weight: bolder;font-size: 20px;margin-bottom: 20px;margin-top: 0px">预测流量排行 预测时间点：{{returntime}}</span>
-          <!--            <el-table-->
-          <!--                v-loading="loading"-->
-          <!--                element-loading-text="拼命加载中"-->
-          <!--                element-loading-spinner="el-icon-loading"-->
-          <!--                element-loading-background="rgba(0, 0, 0, 0.8)"-->
-          <!--                :header-cell-style="{background:'#206cbb',color:'#ffffff',fontWeight:'bolder',fontSize: '16px'}"-->
-          <!--                :cell-style="{color:'#ffffff',fontSize: '16px'}"-->
-          <!--                :data="tableData"-->
-          <!--                style="width: 400px;"-->
-          <!--                height="250px"-->
-          <!--                :row-class-name="tableRowClassName">-->
-          <!--              <el-table-column-->
-          <!--                  style="background-color: rgba(31,97,167,0.6);font-weight: bolder"-->
-
-          <!--                  prop="stationID"-->
-          <!--                  label="排名"-->
-          <!--                  width="70">-->
-          <!--              </el-table-column>-->
-          <!--              <el-table-column-->
-          <!--                  style="background-color: rgba(31,97,167,0.6)"-->
-          <!--                  prop="name"-->
-          <!--                  label="站点名称"-->
-          <!--                  width="200">-->
-          <!--                <template slot-scope="scope">-->
-          <!--                  &lt;!&ndash; 注意：这个地方要传参数进去才能进行操作  函数名称(scope.row) &ndash;&gt;-->
-          <!--                  <div @click="zoomsite(scope.row)">{{ scope.row.name }}</div>-->
-          <!--                </template>-->
-          <!--              </el-table-column>-->
-          <!--              <el-table-column-->
-          <!--                  prop="inNum"-->
-          <!--                  label="预测人流量"-->
-          <!--                  width="130">-->
-          <!--              </el-table-column>-->
-          <!--            </el-table>-->
-          <div id="bar" style="width: 400px;height:250px;margin-top: 0px"></div>
+          <el-button style="background-color: orange;color:white"  @click="getRemote">选择!</el-button>
         </div>
       </el-card>
     </transition>
 
 
-    <div id="label" @click="testclick">
+    <div id="label" @click="">
       <p style="font-size: 20px;font-weight: bolder;color:white;
       text-decoration: underline;letter-spacing:4px">
         上海轨道交通客流量预测</p>
@@ -114,6 +81,7 @@ import AMapLoader from '@amap/amap-jsapi-loader';
 export default {
   data() {
     return {
+      buttontime:0,
       slocal:'',
       spoint:[],
       elocal:'',
@@ -138,13 +106,41 @@ export default {
       tableData: [],
       map:null,
       mysubway: null,
+      circle:null,
     }
   },
   watch: {
     //监听的变量名
-    xValue:{
+    sitesinfo:{
       handler(newName, oldName) {
-        this.showrank();
+        for(var i =0;i<this.sitesinfo.length;i++){
+          this.drawsite(this.sitesinfo[i].longitude,this.sitesinfo[i].latitude,i)
+        }
+      },
+      immediate: true
+    },
+    spoint:{
+      handler(newName, oldName) {
+        this.circle = new AMap.Circle({
+          center:  this.spoint,
+          radius: 2000, //半径
+          borderWeight: 3,
+          strokeColor: "red",
+          // strokeOpacity: 1,
+          strokeWeight: 3,
+          strokeOpacity: 0.5,
+          fillOpacity: 0.2,
+          strokeStyle: "solid",
+          strokeDasharray: [10, 10],
+          // 线样式还支持 'dashed'
+          fillColor: "red",
+          zIndex: 50,
+
+        })
+//添加圆形轨迹
+        this.circle.setMap(this.map)
+        this.map.setCenter(this.spoint)
+        this.map.setZoom(13.5)
       },
       immediate: true
     }
@@ -169,46 +165,53 @@ export default {
     this.showrank();
   },
   methods: {
+    back(){
+      this.map.remove(this.circle);
+      this.map.remove(this.markerList)
+      this.map.setCenter([ 121.48336,31.221424])
+      this.map.setZoom(13.9)
+    },
     showremote(){
-      var placeSearch= new AMap.PlaceSearch({
-        pageSize: 1,//每页显示多少行
-        pageIndex: 1,//显示的下标从那个开始
-        type:'',//类别，可以以|后面加其他类
-        city: "上海", //城市
-        map: this.map,//显示地图
-        panel: "result"//服务显示的面板
-      });
-      //使用placeSearch对象调用关键字搜索的功能
-      var _this=this;
-      placeSearch.search(_this.slocal, function(status, result) {
-        _this.spoint=[result.poiList.pois[0].entr_location.KL,result.poiList.pois[0].entr_location.kT]
-      });
+      if(this.slocal!=''&&this.elocal!=''){
+        this.buttontime=1;
+        var placeSearch= new AMap.PlaceSearch({
+          pageSize: 1,//每页显示多少行
+          pageIndex: 1,//显示的下标从那个开始
+          type:'',//类别，可以以|后面加其他类
+          city: "上海", //城市
+          map: this.map,//显示地图
+          panel: "result"//服务显示的面板
+        });
+        //TODO: 使用placeSearch对象调用关键字搜索的功能
+        var _this=this;
+        placeSearch.search(_this.slocal, function(status, result) {
+          _this.spoint=[result.poiList.pois[0].entr_location.KL,result.poiList.pois[0].entr_location.kT]
+        });
+        var placeSearch2 = new AMap.PlaceSearch({
+          city: '上海', // 兴趣点城市
+          citylimit: true, // 是否强制在设置的城市内搜索，默认false
+          type: "地铁", // 兴趣点类别，用‘|’分隔，默认：'餐饮服务|商务住宅|生活服务'
+          pageSize: 20, // 每页条数，默认10，范围1-50
+          pageIndex: 1, // 页码
+          extensions: "all", // 默认base，返回基本地址信息；all：返回详细信息
+          // map: this.map, // 地图实例，可选
+          // panel: 'panel', // 结果列表的id容器，可选
+          // autoFitView: false, // 是否自动调整地图视野到marker点都处于可见范围
+        });
+        var keywords = "地铁站"; // 关键字
+        var position = this.spoint; // 中心点经纬度
+        var radius = 2000; // 搜索半径 0-50000
 
-      var placeSearch2 = new AMap.PlaceSearch({
-       city: '上海', // 兴趣点城市
-        citylimit: true, // 是否强制在设置的城市内搜索，默认false
-        type: "地铁", // 兴趣点类别，用‘|’分隔，默认：'餐饮服务|商务住宅|生活服务'
-        pageSize: 20, // 每页条数，默认10，范围1-50
-        pageIndex: 1, // 页码
-        extensions: "all", // 默认base，返回基本地址信息；all：返回详细信息
-         // map: this.map, // 地图实例，可选
-      // panel: 'panel', // 结果列表的id容器，可选
-    autoFitView: true, // 是否自动调整地图视野到marker点都处于可见范围
-});
-      var keywords = "地铁站"; // 关键字
-      var position = this.spoint; // 中心点经纬度
-      var radius = 2000; // 搜索半径 0-50000
-      placeSearch2.searchNearBy(keywords, position, radius, function (status, result) {
-        console.log(result)
-        for(var i=0;i<result.poiList.pois.length;i++){
-          console.log(result.poiList.pois[i].address)
-          console.log(result.poiList.pois[i].name)
-        }
 
-        // for (let i = 0; i < result.poiList.pois.length; i++) {
-        //   console.log(result.poiList.pois[i].name);
-        // }
-      });
+        placeSearch2.searchNearBy(keywords, position, radius, function (status, result) {
+          console.log(result)
+          for(var i=0;i<result.poiList.pois.length;i++){
+            request.get('/api/StationFlow/getStationInfoByName/'+result.poiList.pois[i].name).then(res =>{
+              _this.sitesinfo.push(res.data);
+            })
+          }
+        });
+      }
     },
     showrank() {
       let rank = this.$echarts.init(document.getElementById("bar"));
@@ -478,7 +481,7 @@ export default {
     },
 
     testclick(){
-      this.getRemote();
+      console.log('yes');
       // request.post('/api/StationFlow/getLineInNumByID',1).then(res =>{
       //   this.sitesinfo = res.data;
       //   console.log(res);
@@ -491,15 +494,7 @@ export default {
       // for(var i =0;i<this.sitesinfo.length;i++){
       //   this.searchsite(this.sitesinfo[i].name,i);
       // }
-      if(this.clicktime==0){
-        this.showw = !this.showw;
-        this.clicktime++;
-      }
-      if(this.clicktime==1){
-        this.drawChart();
-        this.showrank();
-        this.clicktime=0;
-      }
+
     },
     timeFormate(timeStamp) {
       let year = new Date(timeStamp).getFullYear();
@@ -527,7 +522,7 @@ export default {
         key:"905b4f99bdf009b2c1607f940ec805e5", // 申请好的Web端开发者Key，首次调用 load 时必填
 
         version:"2.0",      // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
-        plugins:['AMap.LineSearch','AMap.PlaceSearch','AMap.ToolBar', 'AMap.Scale','AMap.Transfer'],       // 需要使用的的插件列表，如比例尺'AMap.Scale'等
+        plugins:['AMap.LineSearch','AMap.PlaceSearch','AMap.ToolBar', 'AMap.Scale','AMap.Transfer','AMap.Circle'],       // 需要使用的的插件列表，如比例尺'AMap.Scale'等
       }).then((AMap)=>{
         this.map = new AMap.Map("container",{  //设置地图容器id
           resizeEnable: true,
@@ -544,7 +539,8 @@ export default {
       })
     },
     getRemote(){
-      this.map.remove(this.busPolyline);
+      this.map.remove(this.markerList);
+      this.map.remove(this.circle);
       var transOptions = {
         map: this.map,
         panel: "result",
@@ -555,7 +551,7 @@ export default {
       //根据起、终点坐标查询公交换乘路线
       //trans.search([116.379028, 39.865042], [116.427281, 39.903719]);
 
-      transfer.search([{keyword:'上海南站'},{keyword:'同济大学'}], function(status, result){
+      transfer.search([{keyword:this.chartsitename},{keyword:this.elocal}], function(status, result){
         console.log(result);
       })
     },
@@ -623,9 +619,14 @@ export default {
       var info = [];
       var input=6666;
       var output=3333;
+      var rank='';
+      if(pointData.rank>6.94){rank='拥挤'};
+      if(pointData.rank<=6.94&&pointData.rank>=6.68){rank='中等'};
+      if(pointData.rank<6.68){rank='畅通'};
       info.push("<div class='input-card content-window-card'>");
       info.push("<div style=\"padding:7px 0px 0px 0px;color:royalblue\"><h4>"+name);
-      info.push("</h4><div class='input-item'>列车信息</div></div></div>");
+      info.push("</h4><div class='input-item'>拥堵等级："+rank);
+      info.push("</div></div></div>")
       if(pointData.in<100){info.push("<div><p style='color:green'>预测入站人数");}
       if(pointData.in>=100&&pointData.in<400){info.push("<div><p style='color:sandybrown'>预测入站人数");}
       if(pointData.in>=400){info.push("<div><p style='color:darkred'>预测入站人数");}
@@ -634,7 +635,7 @@ export default {
       if(pointData.out>=100&&pointData.out<400){info.push("<div><p style='color:sandybrown'>预测出站人数");}
       if(pointData.out>=400){info.push("<div><p style='color:darkred'>预测出站人数");}
       info.push(": "+pointData.out+"</p></div>")
-      info.push("<div><p style='color:LightSalmon'>时间点");
+      info.push("<div><p style='color:royalblue'>时间点");
       info.push(": "+pointData.time.substring(11)+"</p></div>")
 
       let infoWindow = new AMap.InfoWindow({
@@ -643,15 +644,16 @@ export default {
       });
       infoWindow.open(this.map, positionResult.lnglat);
       this.chartsitename=pointData.name;
-      request.get('/api/StationFlow/getStationInOutNumByID/'+pointData.id).then(res =>{
-        for(var i =0;i<res.data.length;i++){
-          this.chartdatain[i]=res.data[i].innum;
-          this.chartdataout[i]=res.data[i].outnum;
-          this.xzhou[i]=res.data[i].time.substring(11);
+      this.showw=1;
+      request.get('/api/StationFlow/getStationInOutNumByID/'+pointData.id).then(res => {
+        for (var i = 0; i < res.data.length; i++) {
+          this.chartdatain[i] = res.data[i].innum;
+          this.chartdataout[i] = res.data[i].outnum;
+          this.xzhou[i] = res.data[i].time.substring(11);
         }
         console.log(this.chartdatain)
         this.drawChart();
-      })
+      });
 
     },
 
@@ -692,15 +694,15 @@ export default {
         imageSize: new AMap.Size(50,50) //图标大小
       });
 
-      if(this.sitesinfo[index].inNum+this.sitesinfo[index].outNum<400){
+      if(this.sitesinfo[index].congestion<6.68){
         endicon=icon1;
         var off =new AMap.Pixel(-25, -50);
       }
-      if(this.sitesinfo[index].inNum+this.sitesinfo[index].outNum>=400&&this.sitesinfo[index].inNum+this.sitesinfo[index].outNum<900){
+      if(this.sitesinfo[index].congestion<=6.94&&this.sitesinfo[index].congestion>=6.68){
         endicon=icon2;
         var off =new AMap.Pixel(-25, -50);
       }
-      if(this.sitesinfo[index].inNum+this.sitesinfo[index].outNum>=900){
+      if(this.sitesinfo[index].congestion>6.94){
         endicon=icon3;
         var off =new AMap.Pixel(-25, -50);
       }
@@ -714,7 +716,7 @@ export default {
         // icon:icon1,
         offset: off,
         extData : {"name":this.sitesinfo[index].name,"in":this.sitesinfo[index].inNum,"out":this.sitesinfo[index].outNum,
-          'id':this.sitesinfo[index].stationID,'time':this.sitesinfo[index].time}
+          'id':this.sitesinfo[index].stationID,'time':this.sitesinfo[index].time,'rank':this.sitesinfo[index].congestion}
       });
       //     marker.on("click", () => {
       //   console.log(this.lnglatData[i]);
@@ -917,7 +919,7 @@ export default {
 
 .box-card {
   width: 450px;
-  height: 85%;
+  height: 50%;
   position: absolute;
   right: 10px;
   top:80px;
@@ -948,6 +950,16 @@ export default {
   position: absolute;
   /*width: 10px;*/
   left: 10px;
+  top:170px;
+  background-color: rgba(31,97,167,0.6);
+  /*background-color: #0d5ab1;*/
+  z-index: 10;
+}
+
+.scope4 {
+  position: absolute;
+  /*width: 10px;*/
+  left: 140px;
   top:170px;
   background-color: rgba(31,97,167,0.6);
   /*background-color: #0d5ab1;*/
